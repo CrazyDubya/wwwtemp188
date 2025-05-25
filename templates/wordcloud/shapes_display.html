@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shaped Word Cloud Result - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.custom_shapes') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Create Another
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-home mr-2"></i>WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8">Your Shaped Word Cloud</h1>
+            
+            <!-- Word Cloud Display -->
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <div class="text-center">
+                    <img src="{{ url_for('wordcloud.download', filename=cloud.file) }}" 
+                         alt="Shaped Word Cloud" 
+                         class="mx-auto max-w-full h-auto rounded-lg shadow-md">
+                </div>
+                
+                <!-- Metadata -->
+                <div class="mt-6 grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-gray-50 rounded p-3">
+                        <span class="font-semibold">Shape:</span> {{ cloud.shape|title }}
+                    </div>
+                    <div class="bg-gray-50 rounded p-3">
+                        <span class="font-semibold">Color Scheme:</span> {{ cloud.color_scheme|title }}
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="mt-6 flex flex-wrap gap-3 justify-center">
+                    <a href="{{ url_for('wordcloud.download', filename=cloud.file) }}" 
+                       download
+                       class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg">
+                        <i class="fas fa-download mr-2"></i>Download
+                    </a>
+                    
+                    {% if current_user.is_authenticated %}
+                    <button onclick="alert('Saved to your collection!')" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>Save to Collection
+                    </button>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('wordcloud.custom_shapes') }}" 
+                       class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>Create Another
+                    </a>
+                </div>
+            </div>
+
+            <!-- Share Section -->
+            <div class="mt-8 bg-indigo-50 rounded-lg p-6">
+                <h3 class="font-bold text-lg mb-3">
+                    <i class="fas fa-share-alt mr-2"></i>Share Your Creation
+                </h3>
+                <div class="flex gap-3">
+                    <button onclick="shareToTwitter()" class="bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded-lg">
+                        <i class="fab fa-twitter mr-2"></i>Twitter
+                    </button>
+                    <button onclick="shareToFacebook()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fab fa-facebook mr-2"></i>Facebook
+                    </button>
+                    <button onclick="copyLink()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-link mr-2"></i>Copy Link
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function shareToTwitter() {
+            const text = "Check out my awesome word cloud created with temp188.com!";
+            const url = window.location.href;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function shareToFacebook() {
+            const url = window.location.href;
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
+        }
+    </script>
+</body>
+</html>

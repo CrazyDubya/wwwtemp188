@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordCloud Studio - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #5046e5 0%, #0ea5e9 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                    </a>
+                    <span class="text-gray-400">|</span>
+                    <h1 class="text-xl font-bold text-indigo-600">
+                        <i class="fas fa-cloud mr-2"></i>WordCloud Studio
+                    </h1>
+                </div>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('wordcloud.my_clouds') }}" class="text-gray-600 hover:text-indigo-600">
+                    <i class="fas fa-folder mr-2"></i>My Clouds
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold mb-4">Create Beautiful Word Clouds</h1>
+            <p class="text-xl">Choose your preferred tool to visualize text in stunning ways</p>
+        </div>
+    </section>
+
+    <!-- Tools Grid -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Quick Generator -->
+                <div class="card-hover bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-2 bg-green-500"></div>
+                    <div class="p-6">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
+                            <i class="fas fa-bolt text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Quick Generator</h3>
+                        <p class="text-gray-600 mb-4">
+                            Create word clouds instantly with red, white, and blue themes.
+                        </p>
+                        <ul class="space-y-2 mb-6 text-gray-700">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>No login required</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>3 color variations</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i>Instant download</li>
+                        </ul>
+                        <a href="{{ url_for('wordcloud.quick_generator') }}" 
+                           class="block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg">
+                            Start Creating
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Custom Shapes -->
+                <div class="card-hover bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-2 bg-blue-500"></div>
+                    <div class="p-6">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
+                            <i class="fas fa-shapes text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Custom Shapes</h3>
+                        <p class="text-gray-600 mb-4">
+                            Upload mask images to create word clouds in any shape.
+                        </p>
+                        <ul class="space-y-2 mb-6 text-gray-700">
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Custom masks</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Full color control</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Advanced options</li>
+                        </ul>
+                        <a href="{{ url_for('wordcloud.custom_shapes') }}" 
+                           class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">
+                            Create Shaped Clouds
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Advanced Studio -->
+                <div class="card-hover bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-2 bg-indigo-600"></div>
+                    <div class="p-6">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4 text-indigo-600">
+                            <i class="fas fa-paint-brush text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">Advanced Studio</h3>
+                        <p class="text-gray-600 mb-4">
+                            Professional features with analytics and multiple styles.
+                        </p>
+                        <ul class="space-y-2 mb-6 text-gray-700">
+                            <li><i class="fas fa-check text-indigo-600 mr-2"></i>Word frequency</li>
+                            <li><i class="fas fa-check text-indigo-600 mr-2"></i>Multiple styles</li>
+                            <li><i class="fas fa-check text-indigo-600 mr-2"></i>Save to account</li>
+                        </ul>
+                        <a href="{{ url_for('wordcloud.advanced_studio') }}" 
+                           class="block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg">
+                            Open Studio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Showcase Links -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Explore All Options</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <a href="{{ url_for('wordcloud.color_showcase') }}" 
+                   class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 text-white hover:shadow-xl transition-shadow">
+                    <h3 class="text-xl font-bold mb-2">
+                        <i class="fas fa-palette mr-2"></i>Browse All Color Schemes
+                    </h3>
+                    <p>Explore 60+ color schemes across 10 categories</p>
+                    <div class="mt-3 flex space-x-1">
+                        <span class="w-8 h-8 rounded" style="background: #440154"></span>
+                        <span class="w-8 h-8 rounded" style="background: #31688e"></span>
+                        <span class="w-8 h-8 rounded" style="background: #35b779"></span>
+                        <span class="w-8 h-8 rounded" style="background: #fde725"></span>
+                        <span class="w-8 h-8 rounded" style="background: #ff0000"></span>
+                        <span class="w-8 h-8 rounded" style="background: #0000ff"></span>
+                        <span class="text-xl ml-2">...</span>
+                    </div>
+                </a>
+                
+                <a href="{{ url_for('wordcloud.masks_showcase') }}" 
+                   class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg p-6 text-white hover:shadow-xl transition-shadow">
+                    <h3 class="text-xl font-bold mb-2">
+                        <i class="fas fa-shapes mr-2"></i>View All Shape Masks
+                    </h3>
+                    <p>Choose from 40+ pre-designed shapes or upload your own</p>
+                    <div class="mt-3 flex space-x-2 text-3xl">
+                        <i class="fas fa-heart"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-cloud"></i>
+                        <i class="fas fa-comment"></i>
+                        <span class="text-xl">...</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Preview -->
+    <section class="py-12 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Community Gallery</h2>
+            <div class="text-center">
+                <a href="{{ url_for('wordcloud.gallery') }}" class="text-indigo-600 hover:text-indigo-800 font-medium">
+                    <i class="fas fa-images mr-2"></i>Browse Public Word Clouds
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features & Attribution -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-8">
+                <h3 class="text-2xl font-bold mb-4 text-center">Why Choose Our WordCloud Studio?</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <i class="fas fa-tachometer-alt text-4xl text-indigo-600 mb-3"></i>
+                        <h4 class="font-bold mb-2">Lightning Fast</h4>
+                        <p class="text-gray-700">Generate beautiful word clouds in seconds</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-paint-brush text-4xl text-purple-600 mb-3"></i>
+                        <h4 class="font-bold mb-2">Fully Customizable</h4>
+                        <p class="text-gray-700">Colors, shapes, fonts - everything is adjustable</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-download text-4xl text-green-600 mb-3"></i>
+                        <h4 class="font-bold mb-2">High Resolution</h4>
+                        <p class="text-gray-700">Export in high quality for print or web</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <a href="{{ url_for('wordcloud.features') }}" 
+                       class="text-indigo-600 hover:text-indigo-800 font-medium">
+                        <i class="fas fa-list mr-2"></i>View All Features & Capabilities
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Attribution Footer -->
+            <div class="mt-8 text-center text-gray-600 text-sm">
+                <p>Powered by the <a href="https://github.com/amueller/word_cloud" class="text-indigo-600 hover:underline" target="_blank">word_cloud library</a> by Andreas Mueller (MIT License)</p>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

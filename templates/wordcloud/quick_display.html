@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Word Clouds - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.quick_generator') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Create Another
+                    </a>
+                </div>
+                <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                    WordCloud Studio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Your Word Clouds Are Ready!</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for cloud in clouds %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="h-2 {% if loop.index0 == 0 %}bg-red-500{% elif loop.index0 == 1 %}bg-gray-300{% else %}bg-blue-500{% endif %}"></div>
+                <div class="p-4">
+                    <h3 class="font-bold text-lg mb-4 text-center">
+                        Variation {{ loop.index }}
+                    </h3>
+                    <div class="bg-gray-100 rounded-lg p-2 mb-4">
+                        <img src="{{ url_for('wordcloud.download', filename=cloud) }}" 
+                             alt="Word Cloud {{ loop.index }}" 
+                             class="w-full h-auto">
+                    </div>
+                    <a href="{{ url_for('wordcloud.download', filename=cloud) }}" 
+                       download="wordcloud_{{ loop.index }}.png"
+                       class="block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">
+                        <i class="fas fa-download mr-2"></i>Download
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-12 text-center">
+            <p class="text-gray-600 mb-4">
+                These word clouds will be available for download for the next hour.
+            </p>
+            {% if not current_user.is_authenticated %}
+            <p class="text-gray-700">
+                <a href="{{ url_for('auth.signup') }}" class="text-indigo-600 hover:text-indigo-800 font-medium">
+                    Create an account
+                </a> to save your word clouds permanently!
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

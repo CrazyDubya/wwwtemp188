@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Navigation menu */
+        nav { background-color: #333; }
+        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; }
+        nav li { margin: 0; padding: 0; }
+        nav a { color: white; text-decoration: none; padding: 15px 20px; display: block; transition: background-color 0.3s; }
+        nav a:hover, nav a.active { background-color: #0066cc; }
+        nav a.active { font-weight: bold; }
+        
+        /* Responsive Menu */
+        .menu-toggle { display: none; background: none; border: none; font-size: 20px; color: white; cursor: pointer; padding: 15px; }
+        
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            nav ul { flex-direction: column; display: none; }
+            nav ul.show { display: flex; }
+            nav li { width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-700 text-white py-6 px-4 text-center">
+        <h1 class="text-3xl font-bold">temp188.com</h1>
+        <p class="mt-2">Quick and powerful temporary utilities</p>
+    </header>
+    
+    <nav>
+        <button class="menu-toggle">☰</button>
+        <ul>
+            <li><a href="/mcp/index.html">Home</a></li>
+            <li><a href="/mcp/login" class="active">Login</a></li>
+            <li><a href="/mcp/signup">Sign Up</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-6 text-blue-700 border-b pb-2">Login to Your Account</h2>
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-4 p-3 rounded-md {% if category == 'danger' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="post" action="/mcp/login" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-gray-700 font-medium mb-1">Username</label>
+                    <input type="text" id="username" name="username" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-gray-700 font-medium mb-1">Password</label>
+                    <input type="password" id="password" name="password" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md shadow-md transition duration-200">
+                    Login
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">Don't have an account? <a href="/mcp/signup" class="text-blue-600 hover:underline">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-white py-6 px-4 text-center mt-10">
+        <p>&copy; 2025 temp188.com - Quick and powerful temporary utilities</p>
+        <p class="text-sm text-gray-400 mt-2">All services are available on a credit-based system.</p>
+    </footer>
+
+    <script>
+        // Menu toggle functionality
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('nav ul').classList.toggle('show');
+        });
+    </script>
+</body>
+</html>

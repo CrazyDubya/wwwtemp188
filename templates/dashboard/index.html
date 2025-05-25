@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-2xl font-bold text-indigo-600">
+                    <i class="fas fa-rocket mr-2"></i>temp188
+                </a>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-700">Welcome, {{ current_user.username }}!</span>
+                    <a href="{{ url_for('auth.logout') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">Your Dashboard</h1>
+        
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-indigo-100 rounded-lg">
+                        <i class="fas fa-cloud text-2xl text-indigo-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Total Clouds</p>
+                        <p class="text-2xl font-bold">{{ stats.total_clouds }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-lg">
+                        <i class="fas fa-globe text-2xl text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Public Clouds</p>
+                        <p class="text-2xl font-bold">{{ stats.public_clouds }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-lg">
+                        <i class="fas fa-eye text-2xl text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Total Views</p>
+                        <p class="text-2xl font-bold">{{ stats.total_views }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-purple-100 rounded-lg">
+                        <i class="fas fa-chart-line text-2xl text-purple-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">This Month</p>
+                        <p class="text-2xl font-bold">{{ stats.recent_activity }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="{{ url_for('wordcloud.index') }}" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-cloud text-3xl text-indigo-600 mb-2"></i>
+                    <p class="font-medium">Create Word Cloud</p>
+                </a>
+                <a href="{{ url_for('wordcloud.my_clouds') }}" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-folder text-3xl text-blue-600 mb-2"></i>
+                    <p class="font-medium">My Clouds</p>
+                </a>
+                <a href="{{ url_for('auth.profile') }}" class="text-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-user text-3xl text-green-600 mb-2"></i>
+                    <p class="font-medium">Profile</p>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Recent Word Clouds -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-4">Recent Word Clouds</h2>
+            {% if recent_clouds %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {% for cloud in recent_clouds %}
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-medium mb-2">{{ cloud.title }}</h3>
+                    <p class="text-sm text-gray-600 mb-2">{{ cloud.created_at.strftime('%b %d, %Y') }}</p>
+                    <div class="flex justify-between">
+                        <a href="{{ url_for('wordcloud.download', filename=cloud.file_path.split('/')[-1]) }}" class="text-indigo-600 hover:text-indigo-800 text-sm">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </a>
+                        <span class="text-sm text-gray-500">
+                            <i class="fas fa-eye mr-1"></i>{{ cloud.views }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-600">No word clouds yet. <a href="{{ url_for('wordcloud.index') }}" class="text-indigo-600 hover:text-indigo-800">Create your first one!</a></p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

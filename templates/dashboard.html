@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        /* Navigation menu */
+        nav { background-color: #333; }
+        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; }
+        nav li { margin: 0; padding: 0; }
+        nav a { color: white; text-decoration: none; padding: 15px 20px; display: block; transition: background-color 0.3s; }
+        nav a:hover, nav a.active { background-color: #0066cc; }
+        nav a.active { font-weight: bold; }
+        
+        /* Responsive Menu */
+        .menu-toggle { display: none; background: none; border: none; font-size: 20px; color: white; cursor: pointer; padding: 15px; }
+        
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            nav ul { flex-direction: column; display: none; }
+            nav ul.show { display: flex; }
+            nav li { width: 100%; }
+        }
+        
+        /* Card hover effects */
+        .credit-card {
+            transition: all 0.3s ease;
+        }
+        .credit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Service cards */
+        .service-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .service-card:hover {
+            border-color: #4299e1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-700 text-white py-6 px-4 text-center">
+        <h1 class="text-3xl font-bold">temp188.com Dashboard</h1>
+        <p class="mt-2">Welcome, {{ user.username }}!</p>
+    </header>
+    
+    <nav>
+        <button class="menu-toggle">☰</button>
+        <ul>
+            <li><a href="/mcp/index.html">Home</a></li>
+            <li><a href="/mcp/dashboard" class="active">Dashboard</a></li>
+            <li><a href="/mcp/wordcloud">WordCloud Generator</a></li>
+            <li><a href="/mcp/logout">Logout</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container mx-auto px-4 py-8">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-3 rounded-md {% if category == 'danger' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Credit Balance -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-blue-700">Your Credit Balance</h2>
+                <div class="bg-blue-600 text-white rounded-full py-2 px-4 text-xl font-bold">
+                    {{ user.credits }} Credits
+                </div>
+            </div>
+            <p class="mt-2 text-gray-600">Credits are used to access our services. Each service costs 1 credit per use.</p>
+        </div>
+        
+        <!-- Services -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4 text-blue-700 border-b pb-2">Available Services</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                <div class="service-card bg-white rounded-lg shadow p-4 border-2 border-blue-200">
+                    <h3 class="text-lg font-semibold text-blue-700">WordCloud Generator</h3>
+                    <p class="text-gray-600 mt-2">Generate beautiful word clouds from your text with many customization options.</p>
+                    <p class="text-sm text-gray-500 mt-2">Cost: <span class="font-bold">1 credit</span></p>
+                    <a href="/mcp/wordcloud" class="inline-block mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        Use Service
+                    </a>
+                </div>
+                
+                <div class="service-card bg-white rounded-lg shadow p-4 border-2 border-gray-200 opacity-50">
+                    <h3 class="text-lg font-semibold text-gray-700">Document Converter</h3>
+                    <p class="text-gray-600 mt-2">Convert documents between different formats with our high-quality converter.</p>
+                    <p class="text-sm text-gray-500 mt-2">Cost: <span class="font-bold">1 credit</span></p>
+                    <button disabled class="inline-block mt-3 bg-gray-400 text-white font-bold py-2 px-4 rounded cursor-not-allowed">
+                        Coming Soon
+                    </button>
+                </div>
+                
+                <div class="service-card bg-white rounded-lg shadow p-4 border-2 border-gray-200 opacity-50">
+                    <h3 class="text-lg font-semibold text-gray-700">Image Enhancer</h3>
+                    <p class="text-gray-600 mt-2">Enhance and optimize your images with our AI-powered image processor.</p>
+                    <p class="text-sm text-gray-500 mt-2">Cost: <span class="font-bold">1 credit</span></p>
+                    <button disabled class="inline-block mt-3 bg-gray-400 text-white font-bold py-2 px-4 rounded cursor-not-allowed">
+                        Coming Soon
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Buy Credits -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4 text-blue-700 border-b pb-2">Buy More Credits</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-4">
+                {% for package in packages %}
+                <div class="credit-card bg-white rounded-lg shadow-md p-4 border border-gray-200 text-center">
+                    <h3 class="text-lg font-semibold text-blue-700">{{ package.name }}</h3>
+                    <div class="text-3xl font-bold text-blue-600 my-2">{{ package.credits }}</div>
+                    <p class="text-gray-600">Credits</p>
+                    <div class="mt-3 text-xl font-bold">${{ package.price / 100 }}</div>
+                    <button onclick="buyCredits({{ package.id }})" class="w-full mt-3 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        Buy Now
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Recent Transactions -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-blue-700 border-b pb-2">Recent Transactions</h2>
+            
+            {% if transactions %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Date</th>
+                            <th class="py-3 px-6 text-left">Type</th>
+                            <th class="py-3 px-6 text-left">Description</th>
+                            <th class="py-3 px-6 text-right">Credits</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600 text-sm">
+                        {% for transaction in transactions %}
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="py-3 px-6 text-left">{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td class="py-3 px-6 text-left">
+                                <span class="font-medium 
+                                    {% if transaction.transaction_type == 'purchase' %}text-green-600
+                                    {% elif transaction.transaction_type == 'usage' %}text-red-600
+                                    {% else %}text-blue-600{% endif %}">
+                                    {{ transaction.transaction_type.capitalize() }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-6 text-left">{{ transaction.description }}</td>
+                            <td class="py-3 px-6 text-right font-bold {% if transaction.amount > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                {% if transaction.amount > 0 %}+{% endif %}{{ transaction.amount }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-600">No transaction history yet. Start using our services or buy credits!</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-white py-6 px-4 text-center mt-10">
+        <p>&copy; 2025 temp188.com - Quick and powerful temporary utilities</p>
+        <p class="text-sm text-gray-400 mt-2">All services are available on a credit-based system.</p>
+    </footer>
+
+    <script>
+        // Initialize Stripe
+        var stripe = Stripe('{{ stripe_public_key }}');
+        
+        // Buy credits function
+        function buyCredits(packageId) {
+            fetch('/buy-credits/' + packageId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                // Redirect to Stripe checkout
+                stripe.redirectToCheckout({
+                    sessionId: data.id
+                }).then(function(result) {
+                    if (result.error) {
+                        alert(result.error.message);
+                    }
+                });
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+        
+        // Menu toggle functionality
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('nav ul').classList.toggle('show');
+        });
+    </script>
+</body>
+</html>

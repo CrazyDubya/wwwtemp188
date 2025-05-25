@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Navigation menu */
+        nav { background-color: #333; }
+        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; }
+        nav li { margin: 0; padding: 0; }
+        nav a { color: white; text-decoration: none; padding: 15px 20px; display: block; transition: background-color 0.3s; }
+        nav a:hover, nav a.active { background-color: #0066cc; }
+        
+        /* Responsive Menu */
+        .menu-toggle { display: none; background: none; border: none; font-size: 20px; color: white; cursor: pointer; padding: 15px; }
+        
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            nav ul { flex-direction: column; display: none; }
+            nav ul.show { display: flex; }
+            nav li { width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-700 text-white py-6 px-4 text-center">
+        <h1 class="text-3xl font-bold">Error</h1>
+    </header>
+    
+    <nav>
+        <button class="menu-toggle">☰</button>
+        <ul>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/wordcloud.html">Client-Side WordCloud</a></li>
+            <li><a href="/mcp/wordcloud">MCP WordCloud</a></li>
+            <li><a href="#">MCP Servers</a></li>
+            <li><a href="#">Client Downloads</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container mx-auto px-4 py-16">
+        <div class="bg-white shadow-md rounded-lg p-8 max-w-lg mx-auto text-center">
+            <div class="mb-6">
+                <svg class="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">An Error Occurred</h2>
+            
+            <p class="text-gray-600 mb-6">{{ message }}</p>
+            
+            <a href="/mcp/wordcloud" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition duration-300">
+                Return to WordCloud Generator
+            </a>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-white py-6 px-4 text-center mt-10 absolute bottom-0 w-full">
+        <p>&copy; 2025 temp188.com</p>
+    </footer>
+
+    <script>
+        // Menu toggle functionality
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('nav ul').classList.toggle('show');
+        });
+    </script>
+</body>
+</html>

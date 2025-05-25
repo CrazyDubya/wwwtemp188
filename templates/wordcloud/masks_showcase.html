@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Masks Showcase - WordCloud Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .mask-preview {
+            width: 100%;
+            height: 150px;
+            background-color: #f3f4f6;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mask-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: invert(1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+                <div>
+                    <span class="text-gray-600">{{ total_shapes }} Shape Masks Available</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-4">Complete Shape Masks Collection</h1>
+            <p class="text-gray-600 text-lg">Pre-designed shapes for your custom word clouds</p>
+            <div class="mt-4 bg-blue-50 rounded-lg p-4 max-w-2xl mx-auto">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Black areas will be filled with words. You can also upload your own custom masks!
+                </p>
+            </div>
+        </div>
+
+        {% for category, shapes in shapes_by_category.items() %}
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                {% if category == 'Basic' %}
+                    <i class="fas fa-shapes mr-2"></i>
+                {% elif category == 'Nature' %}
+                    <i class="fas fa-leaf mr-2"></i>
+                {% elif category == 'Communication' %}
+                    <i class="fas fa-comment mr-2"></i>
+                {% elif category == 'Social' %}
+                    <i class="fas fa-share-alt mr-2"></i>
+                {% elif category == 'Symbols' %}
+                    <i class="fas fa-icons mr-2"></i>
+                {% elif category == 'Animals' %}
+                    <i class="fas fa-paw mr-2"></i>
+                {% elif category == 'Tech' %}
+                    <i class="fas fa-laptop mr-2"></i>
+                {% elif category == 'Geography' %}
+                    <i class="fas fa-globe mr-2"></i>
+                {% else %}
+                    <i class="fas fa-folder mr-2"></i>
+                {% endif %}
+                {{ category }} Shapes
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                {% for shape in shapes %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="mask-preview">
+                        <img src="{{ url_for('static', filename='masks/' + shape.file) }}" 
+                             alt="{{ shape.name }} mask"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display:none;" class="text-gray-400">
+                            <i class="fas fa-image text-4xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-center">{{ shape.name|title|replace('_', ' ') }}</h3>
+                        <button onclick="selectShape('{{ shape.name }}')" 
+                                class="mt-2 w-full bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded text-sm transition-colors">
+                            Use Shape
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Custom Upload Section -->
+        <div class="mt-12 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6 text-center">
+                <i class="fas fa-upload mr-2"></i>Create Your Own Shape
+            </h2>
+            <div class="max-w-2xl mx-auto">
+                <p class="text-gray-700 mb-4">
+                    Upload any black and white image to use as a custom mask. The black areas will be filled with words.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg p-4">
+                        <h3 class="font-semibold mb-2">Tips for Best Results:</h3>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li><i class="fas fa-check text-green-500 mr-1"></i> Use high contrast images</li>
+                            <li><i class="fas fa-check text-green-500 mr-1"></i> Black areas = words</li>
+                            <li><i class="fas fa-check text-green-500 mr-1"></i> White areas = empty</li>
+                            <li><i class="fas fa-check text-green-500 mr-1"></i> Simple shapes work best</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white rounded-lg p-4">
+                        <h3 class="font-semibold mb-2">Recommended Tools:</h3>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li><i class="fas fa-paint-brush text-purple-500 mr-1"></i> Photoshop / GIMP</li>
+                            <li><i class="fas fa-vector-square text-purple-500 mr-1"></i> Illustrator / Inkscape</li>
+                            <li><i class="fas fa-pencil-alt text-purple-500 mr-1"></i> MS Paint / Preview</li>
+                            <li><i class="fas fa-mobile text-purple-500 mr-1"></i> Any photo editor</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-center mt-6">
+                    <a href="{{ url_for('wordcloud.custom_shapes') }}" 
+                       class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg inline-block">
+                        <i class="fas fa-magic mr-2"></i>Try Custom Shapes
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attribution -->
+        <div class="mt-12 text-center text-gray-600">
+            <p>Shape masks created for temp188.com WordCloud Studio</p>
+            <p class="text-sm mt-2">Powered by the word_cloud library under MIT License</p>
+        </div>
+    </div>
+
+    <script>
+        function selectShape(shapeName) {
+            // Store selected shape and redirect to shapes generator
+            localStorage.setItem('selectedShape', shapeName);
+            window.location.href = "{{ url_for('wordcloud.custom_shapes') }}";
+        }
+    </script>
+</body>
+</html>

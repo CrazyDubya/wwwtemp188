@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Cloud Gallery - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Community Gallery</h1>
+        
+        {% if clouds %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for cloud in clouds %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="aspect-w-16 aspect-h-9 bg-gray-100">
+                    <img src="{{ cloud.file_path }}" 
+                         alt="{{ cloud.title }}" 
+                         class="object-cover w-full h-48">
+                </div>
+                <div class="p-4">
+                    <h3 class="font-semibold text-lg mb-1">{{ cloud.title }}</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        By {{ cloud.user.username if cloud.user else 'Anonymous' }}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                        {{ cloud.created_at.strftime('%B %d, %Y') }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-images text-6xl text-gray-300 mb-4"></i>
+            <p class="text-xl text-gray-600">No public word clouds yet</p>
+            <p class="text-gray-500 mt-2">Be the first to share your creation!</p>
+            <a href="{{ url_for('wordcloud.index') }}" 
+               class="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg">
+                Create a Word Cloud
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

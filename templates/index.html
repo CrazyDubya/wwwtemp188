@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordCloud Studio - Create Beautiful Word Clouds</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5046e5;
+            --primary-dark: #4338ca;
+            --secondary: #0ea5e9;
+            --accent: #f97316;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .btn {
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .animated-bg {
+            background: linear-gradient(-45deg, #5046e5, #0ea5e9, #8b5cf6, #3b82f6);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .cloud-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(-100%);
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <span class="text-2xl font-bold text-indigo-600 mr-2"><i class="fas fa-cloud"></i></span>
+                        <span class="text-xl font-bold">WordCloud Studio</span>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="/" class="font-medium text-gray-900 hover:text-indigo-600">Home</a>
+                    <a href="/new_cloud_gen.html" class="font-medium text-gray-500 hover:text-indigo-600">Quick Generator</a>
+                    <a href="/cloud/" class="font-medium text-gray-500 hover:text-indigo-600">Custom Shapes</a>
+                    <a href="/mcp/wordcloud" class="font-medium text-gray-500 hover:text-indigo-600">Advanced Studio</a>
+                </nav>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/mcp/login" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
+                    <a href="/mcp/signup" class="bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition-colors">Sign Up Free</a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-gray-500 hover:text-gray-800 focus:outline-none" id="menu-toggle">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu fixed top-0 left-0 bottom-0 w-64 bg-white shadow-lg z-50 p-4" id="mobile-menu">
+            <div class="flex justify-between items-center mb-8">
+                <span class="text-xl font-bold text-indigo-600">Menu</span>
+                <button class="text-gray-500 hover:text-gray-800 focus:outline-none" id="close-menu">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col space-y-4">
+                <a href="/" class="font-medium text-gray-900 hover:text-indigo-600 py-2">Home</a>
+                <a href="/new_cloud_gen.html" class="font-medium text-gray-500 hover:text-indigo-600 py-2">Quick Generator</a>
+                <a href="/cloud/" class="font-medium text-gray-500 hover:text-indigo-600 py-2">Custom Shapes</a>
+                <a href="/mcp/wordcloud" class="font-medium text-gray-500 hover:text-indigo-600 py-2">Advanced Studio</a>
+                <div class="pt-4 border-t border-gray-200">
+                    <a href="/mcp/login" class="block font-medium text-gray-600 hover:text-indigo-600 py-2">Login</a>
+                    <a href="/mcp/signup" class="block bg-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-700 transition-colors mt-4 text-center">Sign Up Free</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="animated-bg text-white py-20 md:py-32">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                        Transform Text Into <span class="text-yellow-300">Beautiful</span> Visual Art
+                    </h1>
+                    <p class="text-xl md:text-2xl mb-8 text-indigo-100">
+                        Create stunning word clouds for presentations, social media, or data visualization in seconds.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="/new_cloud_gen.html" class="btn bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold text-lg shadow-lg inline-block text-center">
+                            Try It Now - Free
+                        </a>
+                        <a href="#how-it-works" class="btn bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg inline-block text-center">
+                            Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="relative">
+                        <!-- Main wordcloud image -->
+                        <img src="/cloud/static/sample_images/logo_btm.jpg" alt="Word Cloud Example" class="rounded-lg shadow-2xl max-w-full h-auto cloud-animation">
+                        
+                        <!-- Floating elements -->
+                        <div class="absolute -top-10 -left-10 bg-white p-3 rounded-lg shadow-lg text-indigo-600 text-lg font-bold animate-pulse">
+                            Customizable
+                        </div>
+                        <div class="absolute -bottom-5 -right-5 bg-yellow-400 p-3 rounded-lg shadow-lg text-indigo-900 text-lg font-bold animate-pulse delay-700">
+                            High Quality
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Three Options Section -->
+    <section class="py-20 bg-white" id="options">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">Choose Your Perfect WordCloud Tool</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Quick Generator -->
+                <div class="card-hover bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-3 bg-green-500"></div>
+                    <div class="p-8">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
+                            <i class="fas fa-bolt text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Quick Generator</h3>
+                        <p class="text-gray-600 mb-6">
+                            Create basic word clouds instantly with our simple tool. Perfect for quick visualizations.
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-2"></i>
+                                <span>No account required</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-2"></i>
+                                <span>Red, white, and blue themes</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-500 mr-2"></i>
+                                <span>Download as PNG</span>
+                            </li>
+                        </ul>
+                        <a href="/new_cloud_gen.html" class="block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                            Try Now - Free
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Custom Shapes -->
+                <div class="card-hover bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-3 bg-blue-500"></div>
+                    <div class="p-8">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
+                            <i class="fas fa-shapes text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Custom Shapes</h3>
+                        <p class="text-gray-600 mb-6">
+                            Create word clouds in custom shapes with our intuitive mask-based generator.
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-blue-500 mr-2"></i>
+                                <span>No account required</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-blue-500 mr-2"></i>
+                                <span>Upload custom mask images</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-blue-500 mr-2"></i>
+                                <span>Full color customization</span>
+                            </li>
+                        </ul>
+                        <a href="/cloud/" class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                            Create Shaped Clouds
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Advanced Studio -->
+                <div class="card-hover bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="h-3 bg-indigo-600"></div>
+                    <div class="p-8">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4 text-indigo-600">
+                            <i class="fas fa-paint-brush text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Advanced Studio</h3>
+                        <p class="text-gray-600 mb-6">
+                            Professional-grade word cloud generator with advanced features and analytics.
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-indigo-600 mr-2"></i>
+                                <span>Multiple cloud styles</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-indigo-600 mr-2"></i>
+                                <span>Word frequency analysis</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-indigo-600 mr-2"></i>
+                                <span>Advanced customization</span>
+                            </li>
+                        </ul>
+                        <a href="/mcp/wordcloud" class="block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                            Enter The Studio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 bg-gray-50" id="how-it-works">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">How It Works</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Step 1 -->
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <span class="text-2xl font-bold text-white">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Enter Your Text</h3>
+                    <p class="text-gray-600">
+                        Paste any text, article, speech, or list of words you want to visualize.
+                    </p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <span class="text-2xl font-bold text-white">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Customize Your Cloud</h3>
+                    <p class="text-gray-600">
+                        Choose colors, shapes, fonts, and other styling options to match your needs.
+                    </p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <span class="text-2xl font-bold text-white">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Generate</h3>
+                    <p class="text-gray-600">
+                        Our powerful algorithms process your text and create beautiful visualizations.
+                    </p>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <span class="text-2xl font-bold text-white">4</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Download & Share</h3>
+                    <p class="text-gray-600">
+                        Download your word cloud as a high-quality image ready to use anywhere.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <a href="/new_cloud_gen.html" class="btn inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-colors">
+                    Create Your First WordCloud
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">Powerful Features</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Feature 1 -->
+                <div class="flex">
+                    <div class="mr-4 text-indigo-600 text-3xl">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Advanced Customization</h3>
+                        <p class="text-gray-600">
+                            Control every aspect of your word cloud including colors, fonts, sizes, and orientations.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="flex">
+                    <div class="mr-4 text-indigo-600 text-3xl">
+                        <i class="fas fa-mask"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Custom Shape Masks</h3>
+                        <p class="text-gray-600">
+                            Create word clouds in any shape by uploading your own mask images or using our templates.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="flex">
+                    <div class="mr-4 text-indigo-600 text-3xl">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Word Frequency Analysis</h3>
+                        <p class="text-gray-600">
+                            See detailed analytics of the most common words and their frequencies in your text.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="flex">
+                    <div class="mr-4 text-indigo-600 text-3xl">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">High-Quality Exports</h3>
+                        <p class="text-gray-600">
+                            Download your word clouds as high-resolution PNG images perfect for printing or sharing.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="flex">
+                    <div class="mr-4 text-indigo-600 text-3xl">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Smart Filtering</h3>
+                        <p class="text-gray-600">
+                            Automatically filter common words and customize your stop words for better results.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="flex">
+                    <div class="mr-4 text-indigo-600 text-3xl">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Instant Generation</h3>
+                        <p class="text-gray-600">
+                            Powerful server-side processing creates your word clouds in seconds, no matter the complexity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Studio Highlight -->
+    <section class="py-20 bg-gradient-to-r from-indigo-600 to-blue-500 text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6">Advanced Studio Experience</h2>
+                    <p class="text-xl mb-8">
+                        Take your word clouds to the next level with our advanced studio. Create multiple variations, analyze word frequencies, and customize every detail.
+                    </p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-300 mt-1 mr-3 text-lg"></i>
+                            <span>Generate 3 different word cloud styles simultaneously</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-300 mt-1 mr-3 text-lg"></i>
+                            <span>View top 25 words frequency chart</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-300 mt-1 mr-3 text-lg"></i>
+                            <span>Full customization of colors, fonts, and masks</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-yellow-300 mt-1 mr-3 text-lg"></i>
+                            <span>Secure temporary access to your results</span>
+                        </li>
+                    </ul>
+                    <a href="/mcp/signup" class="btn inline-block bg-white text-indigo-700 font-bold py-4 px-8 rounded-lg shadow-lg">
+                        Sign Up For Advanced Studio
+                    </a>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="grid grid-cols-2 gap-4">
+                        <img src="/cloud/static/sample_images/heart.jpg" alt="Advanced WordCloud Example 1" class="rounded-lg shadow-xl">
+                        <img src="/cloud/static/sample_images/logo_btm.jpg" alt="Advanced WordCloud Example 2" class="rounded-lg shadow-xl">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Create Beautiful Word Clouds?</h2>
+            <p class="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
+                Choose the option that's right for you and start creating stunning word cloud visualizations in seconds.
+            </p>
+            
+            <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
+                <a href="/new_cloud_gen.html" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg">
+                    Quick Generator
+                </a>
+                <a href="/cloud/" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg">
+                    Custom Shapes
+                </a>
+                <a href="/mcp/wordcloud" class="btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg">
+                    Advanced Studio
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between mb-8">
+                <div class="mb-8 md:mb-0">
+                    <a href="/" class="flex items-center mb-4">
+                        <span class="text-2xl font-bold text-white mr-2"><i class="fas fa-cloud"></i></span>
+                        <span class="text-xl font-bold text-white">WordCloud Studio</span>
+                    </a>
+                    <p class="max-w-md">
+                        Create beautiful word clouds for presentations, social media, or data visualization with our powerful and easy-to-use tools.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-white font-bold mb-4">Tools</h3>
+                        <ul class="space-y-2">
+                            <li><a href="/new_cloud_gen.html" class="hover:text-white">Quick Generator</a></li>
+                            <li><a href="/cloud/" class="hover:text-white">Custom Shapes</a></li>
+                            <li><a href="/mcp/wordcloud" class="hover:text-white">Advanced Studio</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-4">Account</h3>
+                        <ul class="space-y-2">
+                            <li><a href="/mcp/signup" class="hover:text-white">Sign Up</a></li>
+                            <li><a href="/mcp/login" class="hover:text-white">Login</a></li>
+                            <li><a href="/mcp/dashboard" class="hover:text-white">Dashboard</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-4">Resources</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#how-it-works" class="hover:text-white">How It Works</a></li>
+                            <li><a href="https://github.com/amueller/word_cloud" class="hover:text-white" target="_blank">WordCloud Library</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 mt-8 text-center">
+                <p>&copy; 2025 WordCloud Studio - temp188.com | All rights reserved</p>
+                <p class="mt-2 text-sm">
+                    Powered by <a href="https://github.com/amueller/word_cloud" class="text-indigo-400 hover:text-indigo-300">word_cloud</a> - WordCloud generator by Andreas Mueller
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMenu = document.getElementById('close-menu');
+        
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+        });
+        
+        closeMenu.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    // Close mobile menu if open
+                    mobileMenu.classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

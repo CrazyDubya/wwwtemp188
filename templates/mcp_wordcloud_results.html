@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordCloud Results - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .wordcloud-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .wordcloud-img:hover {
+            transform: scale(1.02);
+        }
+        
+        .expiry-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffeeba;
+        }
+        
+        .btn {
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-blue {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-green {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-red {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* Navigation menu */
+        nav { background-color: #333; }
+        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; }
+        nav li { margin: 0; padding: 0; }
+        nav a { color: white; text-decoration: none; padding: 15px 20px; display: block; transition: background-color 0.3s; }
+        nav a:hover, nav a.active { background-color: #0066cc; }
+        nav a.active { font-weight: bold; }
+        
+        /* Responsive Menu */
+        .menu-toggle { display: none; background: none; border: none; font-size: 20px; color: white; cursor: pointer; padding: 15px; }
+        
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            nav ul { flex-direction: column; display: none; }
+            nav ul.show { display: flex; }
+            nav li { width: 100%; }
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .zoomed-image {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-700 text-white py-6 px-4 text-center">
+        <h1 class="text-3xl font-bold">Your WordCloud Results</h1>
+        <p class="mt-2">Generated on {{ metadata.created[:16].replace('T', ' at ') }}</p>
+    </header>
+    
+    <nav>
+        <button class="menu-toggle">☰</button>
+        <ul>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/wordcloud.html">Client-Side WordCloud</a></li>
+            <li><a href="/mcp/wordcloud">MCP WordCloud</a></li>
+            <li><a href="#">MCP Servers</a></li>
+            <li><a href="#">Client Downloads</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container mx-auto px-4 py-8">
+        <!-- Session Information -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6 expiry-warning">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h2 class="text-lg font-semibold">Temporary Access</h2>
+            </div>
+            <p class="mt-2">Your wordclouds will be available until <span class="font-bold">{{ metadata.expires[:16].replace('T', ' at ') }}</span></p>
+            <p class="text-sm mt-1">Save your images by using the download buttons below. After the session expires, these files will be permanently deleted.</p>
+        </div>
+        
+        <!-- Top Words Bar Chart -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-blue-700 border-b pb-2">Top 25 Words</h2>
+            
+            <div class="text-center">
+                <img src="/mcp/wordcloud/image/{{ token }}/{{ metadata.files.top_25_words }}" 
+                     alt="Top 25 Words by Frequency" 
+                     class="wordcloud-img cursor-pointer mx-auto" 
+                     onclick="openModal(this.src)">
+                     
+                <div class="mt-4">
+                    <a href="/mcp/wordcloud/download/{{ token }}/{{ metadata.files.top_25_words }}" 
+                       class="btn btn-blue inline-block px-6 py-2 rounded-md mr-2 mt-3">
+                        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Download Chart
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- WordClouds Section -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-blue-700 border-b pb-2">Your WordClouds</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- WordCloud 1 -->
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <h3 class="text-lg font-medium mb-2">WordCloud 1</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Colormap: <span class="font-semibold">{{ metadata.settings.colormaps[0] }}</span> | 
+                        Background: <span class="font-semibold">{{ metadata.settings.backgrounds[0] }}</span>
+                    </p>
+                    
+                    <img src="/mcp/wordcloud/image/{{ token }}/{{ metadata.files.wordcloud_1 }}" 
+                         alt="WordCloud 1" 
+                         class="wordcloud-img cursor-pointer" 
+                         onclick="openModal(this.src)">
+                         
+                    <div class="mt-4 text-center">
+                        <a href="/mcp/wordcloud/download/{{ token }}/{{ metadata.files.wordcloud_1 }}" 
+                           class="btn btn-green inline-block px-4 py-2 rounded-md">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Download
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- WordCloud 2 -->
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <h3 class="text-lg font-medium mb-2">WordCloud 2</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Colormap: <span class="font-semibold">{{ metadata.settings.colormaps[1] }}</span> | 
+                        Background: <span class="font-semibold">{{ metadata.settings.backgrounds[1] }}</span>
+                    </p>
+                    
+                    <img src="/mcp/wordcloud/image/{{ token }}/{{ metadata.files.wordcloud_2 }}" 
+                         alt="WordCloud 2" 
+                         class="wordcloud-img cursor-pointer" 
+                         onclick="openModal(this.src)">
+                         
+                    <div class="mt-4 text-center">
+                        <a href="/mcp/wordcloud/download/{{ token }}/{{ metadata.files.wordcloud_2 }}" 
+                           class="btn btn-green inline-block px-4 py-2 rounded-md">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Download
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- WordCloud 3 -->
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <h3 class="text-lg font-medium mb-2">WordCloud 3</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Colormap: <span class="font-semibold">{{ metadata.settings.colormaps[2] }}</span> | 
+                        Background: <span class="font-semibold">{{ metadata.settings.backgrounds[2] }}</span>
+                    </p>
+                    
+                    <img src="/mcp/wordcloud/image/{{ token }}/{{ metadata.files.wordcloud_3 }}" 
+                         alt="WordCloud 3" 
+                         class="wordcloud-img cursor-pointer" 
+                         onclick="openModal(this.src)">
+                         
+                    <div class="mt-4 text-center">
+                        <a href="/mcp/wordcloud/download/{{ token }}/{{ metadata.files.wordcloud_3 }}" 
+                           class="btn btn-green inline-block px-4 py-2 rounded-md">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Download All Button -->
+            <div class="text-center mt-8">
+                <a href="/mcp/wordcloud/download-all/{{ token }}" 
+                   class="btn btn-blue inline-block px-8 py-3 rounded-md text-lg">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download All Images (ZIP)
+                </a>
+            </div>
+        </div>
+        
+        <!-- Settings Summary -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-blue-700 border-b pb-2">Settings Summary</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <h3 class="font-medium text-gray-700">Basic Settings</h3>
+                    <ul class="mt-2 text-gray-600 space-y-1">
+                        <li>Max Words: <span class="font-semibold">{{ metadata.settings.max_words }}</span></li>
+                        <li>Width: <span class="font-semibold">{{ metadata.settings.width }}px</span></li>
+                        <li>Height: <span class="font-semibold">{{ metadata.settings.height }}px</span></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-medium text-gray-700">Shape Settings</h3>
+                    <ul class="mt-2 text-gray-600 space-y-1">
+                        <li>Mask: <span class="font-semibold">{{ metadata.settings.mask }}</span></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-medium text-gray-700">Actions</h3>
+                    <div class="mt-2 space-y-2">
+                        <a href="/mcp/wordcloud" class="text-blue-600 hover:underline block">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+                            </svg>
+                            Generate New WordCloud
+                        </a>
+                        <button onclick="confirmCleanup()" class="text-red-600 hover:underline block">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Session Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Image Zoom -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <img id="modalImage" class="zoomed-image" src="" alt="Zoomed WordCloud">
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-white py-6 px-4 text-center mt-10">
+        <p>&copy; 2025 temp188.com - MCP WordCloud Generator</p>
+        <p class="text-sm text-gray-400 mt-2">Secure server-side processing with temporary access tokens.</p>
+        <p class="text-xs text-gray-500 mt-3">Powered by <a href="https://github.com/amueller/word_cloud" class="underline hover:text-blue-300" target="_blank">word_cloud</a> - WordCloud generator by Andreas Mueller</p>
+    </footer>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeBtn = document.getElementsByClassName('modal-close')[0];
+        
+        function openModal(imgSrc) {
+            modal.style.display = 'block';
+            modalImg.src = imgSrc;
+        }
+        
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Cleanup confirmation
+        function confirmCleanup() {
+            if (confirm('Are you sure you want to delete all your session data? This action cannot be undone.')) {
+                fetch('/mcp/wordcloud/cleanup/{{ token }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Session data successfully deleted.');
+                            window.location.href = '/mcp/wordcloud';
+                        } else if (data.warning) {
+                            alert('Warning: ' + data.warning);
+                            window.location.href = '/mcp/wordcloud';
+                        } else {
+                            alert('Error: ' + (data.error || 'Unknown error occurred'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while trying to delete session data.');
+                    });
+            }
+        }
+        
+        // Menu toggle functionality
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('nav ul').classList.toggle('show');
+        });
+    </script>
+</body>
+</html>

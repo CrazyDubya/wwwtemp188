@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Word Cloud Result - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.advanced_studio') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Studio
+                    </a>
+                </div>
+                <div>
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-home mr-2"></i>WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8">Advanced Word Cloud Result</h1>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Word Cloud -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <img src="{{ url_for('wordcloud.download', filename=cloud.file) }}" 
+                             alt="Advanced Word Cloud" 
+                             class="w-full h-auto rounded-lg shadow-md">
+                        
+                        <!-- Download Options -->
+                        <div class="mt-6 flex flex-wrap gap-3 justify-center">
+                            <a href="{{ url_for('wordcloud.download', filename=cloud.file) }}" 
+                               download
+                               class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg">
+                                <i class="fas fa-download mr-2"></i>Download PNG
+                            </a>
+                            
+                            {% if current_user.is_authenticated %}
+                            <button onclick="alert('Saved to your collection!')" 
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                                <i class="fas fa-save mr-2"></i>Save to Collection
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analytics Panel -->
+                <div class="space-y-6">
+                    <!-- Word Statistics -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="font-bold text-lg mb-4">
+                            <i class="fas fa-chart-pie mr-2"></i>Word Statistics
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Words:</span>
+                                <span class="font-semibold">{{ cloud.analytics.total_words }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Unique Words:</span>
+                                <span class="font-semibold">{{ cloud.analytics.unique_words }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Words -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="font-bold text-lg mb-4">
+                            <i class="fas fa-list-ol mr-2"></i>Top 10 Words
+                        </h3>
+                        <div class="space-y-2">
+                            {% for word, freq in cloud.analytics.top_words[:10] %}
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">{{ word }}</span>
+                                <div class="flex items-center">
+                                    <div class="w-24 bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-indigo-600 h-2 rounded-full" 
+                                             style="width: {{ (freq / cloud.analytics.top_words[0][1] * 100)|int }}%"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-600 w-8 text-right">{{ freq }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Parameters Used -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="font-bold text-lg mb-4">
+                            <i class="fas fa-cog mr-2"></i>Parameters
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Dimensions:</span>
+                                <span>{{ cloud.parameters.width }}x{{ cloud.parameters.height }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Color Map:</span>
+                                <span>{{ cloud.parameters.colormap }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Max Words:</span>
+                                <span>{{ cloud.parameters.max_words }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if cloud.analytics.plot %}
+            <!-- Frequency Chart -->
+            <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
+                <h3 class="font-bold text-lg mb-4">
+                    <i class="fas fa-chart-bar mr-2"></i>Word Frequency Distribution
+                </h3>
+                <img src="data:image/png;base64,{{ cloud.analytics.plot }}" 
+                     alt="Word Frequency Chart" 
+                     class="w-full h-auto">
+            </div>
+            {% endif %}
+            
+            <!-- Action Buttons -->
+            <div class="mt-8 text-center">
+                <a href="{{ url_for('wordcloud.advanced_studio') }}" 
+                   class="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition hover:scale-105">
+                    <i class="fas fa-plus mr-2"></i>Create Another Advanced Cloud
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+PE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>New Word Cloud Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+ <div class="container mx-auto p-8">
+ <h1 class="text-3xl font-bold mb-6 text-center">Create Your New Word Cloud</h1>
+ <form id="wordcloudForm" action="/new_generate" method="post" class="space-y-4">
+  <div>
+ <label for="words" class="block text-lg font-medium">Words/Phrases (1 to 4 words each)</label>
+                <textarea id="words" name="words" rows="10" class="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded" placeholder="Enter words/phrases, one per line."></textarea>
+            </div>
+            <div>
+                <label for="weights" class="block text-lg font-medium">Weights (optional, 1 to 10)</label>
+                <textarea id="weights" name="weights" rows="10" class="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded" placeholder="Enter weights corresponding to each word/phrase, one per line."></textarea>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded font-bold text-lg">Generate Word Cloud</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+

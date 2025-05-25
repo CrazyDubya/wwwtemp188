@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Shape Word Clouds - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .shape-preview {
+            width: 80px;
+            height: 80px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8">Custom Shape Word Clouds</h1>
+            
+            <form method="POST" action="{{ url_for('wordcloud.shapes_generate') }}" enctype="multipart/form-data" class="space-y-6">
+                <!-- Text Input -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <label class="block text-gray-700 font-bold mb-3">
+                        <i class="fas fa-paragraph mr-2"></i>Enter Your Text
+                    </label>
+                    <textarea name="text" rows="8" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                            placeholder="Paste your text here... Can be an article, speech, story, or any text you want to visualize!"></textarea>
+                    <p class="text-sm text-gray-600 mt-2">
+                        Common words like "the", "and", "a" will be automatically filtered out.
+                    </p>
+                </div>
+
+                <!-- Shape Selection -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <label class="block text-gray-700 font-bold mb-3">
+                        <i class="fas fa-shapes mr-2"></i>Choose a Shape
+                    </label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Predefined Shapes -->
+                        <label class="cursor-pointer">
+                            <input type="radio" name="shape" value="circle" checked class="sr-only peer shape-radio">
+                            <div class="p-4 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="shape-preview mx-auto mb-2 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm">Circle</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="shape" value="heart" class="sr-only peer">
+                            <div class="p-4 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="shape-preview mx-auto mb-2">
+                                    <i class="fas fa-heart text-5xl text-red-500"></i>
+                                </div>
+                                <span class="text-sm">Heart</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="shape" value="star" class="sr-only peer">
+                            <div class="p-4 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="shape-preview mx-auto mb-2">
+                                    <i class="fas fa-star text-5xl text-yellow-500"></i>
+                                </div>
+                                <span class="text-sm">Star</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="shape" value="cloud" class="sr-only peer">
+                            <div class="p-4 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="shape-preview mx-auto mb-2">
+                                    <i class="fas fa-cloud text-5xl text-blue-400"></i>
+                                </div>
+                                <span class="text-sm">Cloud</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- View All Shapes Link -->
+                    <div class="mt-4 text-center">
+                        <a href="{{ url_for('wordcloud.masks_showcase') }}" 
+                           class="text-purple-600 hover:text-purple-800 font-medium">
+                            <i class="fas fa-th mr-2"></i>Browse All 40+ Shapes
+                        </a>
+                    </div>
+
+                    <!-- Custom Shape Upload -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-upload mr-2"></i>Or Upload Custom Shape
+                        </label>
+                        <input type="file" name="custom_mask" accept="image/*" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        <p class="text-sm text-gray-600 mt-2">
+                            Upload a black and white image where black areas will contain words.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Color Options -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <label class="block text-gray-700 font-bold mb-3">
+                        <i class="fas fa-palette mr-2"></i>Color Scheme
+                    </label>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="color_scheme" value="ocean" checked class="sr-only peer">
+                            <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="h-6 w-full mb-1 rounded" style="background: linear-gradient(to right, #000080, #4169e1, #87ceeb)"></div>
+                                <span class="text-xs">Ocean</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="color_scheme" value="sunset" class="sr-only peer">
+                            <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="h-6 w-full mb-1 rounded" style="background: linear-gradient(to right, #ff4500, #ff8c00, #ffd700)"></div>
+                                <span class="text-xs">Sunset</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="color_scheme" value="forest" class="sr-only peer">
+                            <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="h-6 w-full mb-1 rounded" style="background: linear-gradient(to right, #228b22, #32cd32, #90ee90)"></div>
+                                <span class="text-xs">Forest</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="color_scheme" value="galaxy" class="sr-only peer">
+                            <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="h-6 w-full mb-1 rounded" style="background: linear-gradient(to right, #4b0082, #8a2be2, #da70d6)"></div>
+                                <span class="text-xs">Galaxy</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="color_scheme" value="neon" class="sr-only peer">
+                            <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                <div class="h-6 w-full mb-1 rounded" style="background: linear-gradient(to right, #ff1493, #00ff00, #00ffff)"></div>
+                                <span class="text-xs">Neon</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="use_image_colors" value="true" class="form-checkbox text-indigo-600">
+                            <span class="ml-2 text-gray-700">Use colors from uploaded image (if applicable)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="text-center">
+                    <button type="submit" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg transform transition hover:scale-105">
+                        <i class="fas fa-magic mr-2"></i>Create Shaped Word Cloud
+                    </button>
+                </div>
+            </form>
+
+            <!-- Info Section -->
+            <div class="mt-8 bg-purple-50 rounded-lg p-6">
+                <h3 class="font-bold text-lg mb-2">
+                    <i class="fas fa-lightbulb mr-2"></i>Pro Tips
+                </h3>
+                <ul class="space-y-2 text-gray-700">
+                    <li><i class="fas fa-check text-purple-500 mr-2"></i>Longer texts create more detailed word clouds</li>
+                    <li><i class="fas fa-check text-purple-500 mr-2"></i>Custom shapes work best with high-contrast black and white images</li>
+                    <li><i class="fas fa-check text-purple-500 mr-2"></i>Try different color schemes to match your content's mood</li>
+                    <li><i class="fas fa-check text-purple-500 mr-2"></i>Common words are automatically filtered for better results</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check if a shape was pre-selected from the showcase
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedShape = localStorage.getItem('selectedShape');
+            if (selectedShape) {
+                // Find and check the radio button
+                const shapeRadio = document.querySelector(`input[name="shape"][value="${selectedShape}"]`);
+                if (shapeRadio) {
+                    shapeRadio.checked = true;
+                }
+                // Clear the storage
+                localStorage.removeItem('selectedShape');
+                
+                // Show a notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i>Shape "${selectedShape}" selected!`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

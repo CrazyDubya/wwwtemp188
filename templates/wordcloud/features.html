@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordCloud Features & Capabilities - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4">Complete WordCloud Features</h1>
+            <p class="text-xl text-gray-600">Leveraging the full power of the word_cloud library</p>
+            <div class="mt-4 bg-blue-50 rounded-lg p-4 max-w-2xl mx-auto">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Attribution:</strong> Powered by the word_cloud library by Andreas Mueller
+                    <br>
+                    <a href="https://github.com/amueller/word_cloud" class="underline" target="_blank">
+                        github.com/amueller/word_cloud
+                    </a> (MIT License)
+                </p>
+            </div>
+        </div>
+
+        <!-- Feature Sets -->
+        {% for key, feature_set in feature_sets.items() %}
+        <div class="mb-12">
+            <div class="feature-card rounded-lg p-8">
+                <h2 class="text-2xl font-bold mb-4">
+                    {% if key == 'text_processing' %}
+                        <i class="fas fa-file-alt mr-2"></i>
+                    {% elif key == 'layout_control' %}
+                        <i class="fas fa-th mr-2"></i>
+                    {% elif key == 'typography' %}
+                        <i class="fas fa-font mr-2"></i>
+                    {% elif key == 'visual_styling' %}
+                        <i class="fas fa-palette mr-2"></i>
+                    {% elif key == 'output_options' %}
+                        <i class="fas fa-cog mr-2"></i>
+                    {% elif key == 'export_formats' %}
+                        <i class="fas fa-download mr-2"></i>
+                    {% elif key == 'color_functions' %}
+                        <i class="fas fa-brush mr-2"></i>
+                    {% endif %}
+                    {{ feature_set.name }}
+                </h2>
+                <p class="text-gray-700 mb-6">{{ feature_set.description }}</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% if feature_set.features %}
+                        {% for feature in feature_set.features %}
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <code class="text-sm text-purple-600">{{ feature }}</code>
+                            {% if feature == 'stopwords' %}
+                                <p class="text-xs text-gray-600 mt-1">Remove common words automatically</p>
+                            {% elif feature == 'regexp' %}
+                                <p class="text-xs text-gray-600 mt-1">Custom text tokenization patterns</p>
+                            {% elif feature == 'normalize_plurals' %}
+                                <p class="text-xs text-gray-600 mt-1">Treat singular/plural as same word</p>
+                            {% elif feature == 'collocations' %}
+                                <p class="text-xs text-gray-600 mt-1">Detect and include word pairs</p>
+                            {% elif feature == 'prefer_horizontal' %}
+                                <p class="text-xs text-gray-600 mt-1">Control word orientation (0-1)</p>
+                            {% elif feature == 'relative_scaling' %}
+                                <p class="text-xs text-gray-600 mt-1">Word size importance (0-1 or 'auto')</p>
+                            {% elif feature == 'font_path' %}
+                                <p class="text-xs text-gray-600 mt-1">Use custom TTF/OTF fonts</p>
+                            {% elif feature == 'colormap' %}
+                                <p class="text-xs text-gray-600 mt-1">60+ matplotlib color schemes</p>
+                            {% elif feature == 'mask' %}
+                                <p class="text-xs text-gray-600 mt-1">Custom shapes from images</p>
+                            {% elif feature == 'contour_width' %}
+                                <p class="text-xs text-gray-600 mt-1">Outline around mask shape</p>
+                            {% elif feature == 'random_state' %}
+                                <p class="text-xs text-gray-600 mt-1">Reproducible layouts</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if feature_set.methods %}
+                        {% for method in feature_set.methods %}
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <code class="text-sm text-green-600">{{ method }}()</code>
+                            {% if method == 'to_image' %}
+                                <p class="text-xs text-gray-600 mt-1">Export as PIL Image</p>
+                            {% elif method == 'to_array' %}
+                                <p class="text-xs text-gray-600 mt-1">Export as numpy array</p>
+                            {% elif method == 'to_file' %}
+                                <p class="text-xs text-gray-600 mt-1">Save as PNG/JPG</p>
+                            {% elif method == 'to_svg' %}
+                                <p class="text-xs text-gray-600 mt-1">Export as scalable vector</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if feature_set.functions %}
+                        {% for function in feature_set.functions %}
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <code class="text-sm text-blue-600">{{ function }}</code>
+                            {% if function == 'ImageColorGenerator' %}
+                                <p class="text-xs text-gray-600 mt-1">Extract colors from image</p>
+                            {% elif function == 'get_single_color_func' %}
+                                <p class="text-xs text-gray-600 mt-1">Single hue variations</p>
+                            {% elif function == 'grey_color_func' %}
+                                <p class="text-xs text-gray-600 mt-1">Random grey shades</p>
+                            {% elif function == 'rainbow_color_func' %}
+                                <p class="text-xs text-gray-600 mt-1">Position-based rainbow</p>
+                            {% elif function == 'size_color_func' %}
+                                <p class="text-xs text-gray-600 mt-1">Size-based coloring</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- All Parameters Reference -->
+        <div class="mt-12 bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6">
+                <i class="fas fa-book mr-2"></i>Complete Parameter Reference
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-2 text-left">Parameter</th>
+                            <th class="px-4 py-2 text-left">Type</th>
+                            <th class="px-4 py-2 text-left">Default</th>
+                            <th class="px-4 py-2 text-left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b">
+                            <td class="px-4 py-2"><code>width</code></td>
+                            <td class="px-4 py-2">int</td>
+                            <td class="px-4 py-2">400</td>
+                            <td class="px-4 py-2">Canvas width in pixels</td>
+                        </tr>
+                        <tr class="border-b bg-gray-50">
+                            <td class="px-4 py-2"><code>height</code></td>
+                            <td class="px-4 py-2">int</td>
+                            <td class="px-4 py-2">200</td>
+                            <td class="px-4 py-2">Canvas height in pixels</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="px-4 py-2"><code>max_words</code></td>
+                            <td class="px-4 py-2">int</td>
+                            <td class="px-4 py-2">200</td>
+                            <td class="px-4 py-2">Maximum number of words</td>
+                        </tr>
+                        <tr class="border-b bg-gray-50">
+                            <td class="px-4 py-2"><code>relative_scaling</code></td>
+                            <td class="px-4 py-2">float/'auto'</td>
+                            <td class="px-4 py-2">'auto'</td>
+                            <td class="px-4 py-2">Word frequency importance (0-1)</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="px-4 py-2"><code>min_font_size</code></td>
+                            <td class="px-4 py-2">int</td>
+                            <td class="px-4 py-2">4</td>
+                            <td class="px-4 py-2">Smallest font size</td>
+                        </tr>
+                        <tr class="border-b bg-gray-50">
+                            <td class="px-4 py-2"><code>font_step</code></td>
+                            <td class="px-4 py-2">int</td>
+                            <td class="px-4 py-2">1</td>
+                            <td class="px-4 py-2">Font size iteration step</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="px-4 py-2"><code>prefer_horizontal</code></td>
+                            <td class="px-4 py-2">float</td>
+                            <td class="px-4 py-2">0.9</td>
+                            <td class="px-4 py-2">Horizontal text preference (0-1)</td>
+                        </tr>
+                        <tr class="border-b bg-gray-50">
+                            <td class="px-4 py-2"><code>mask</code></td>
+                            <td class="px-4 py-2">ndarray</td>
+                            <td class="px-4 py-2">None</td>
+                            <td class="px-4 py-2">Binary mask for custom shapes</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="px-4 py-2"><code>scale</code></td>
+                            <td class="px-4 py-2">float</td>
+                            <td class="px-4 py-2">1</td>
+                            <td class="px-4 py-2">Scaling between computation and drawing</td>
+                        </tr>
+                        <tr class="border-b bg-gray-50">
+                            <td class="px-4 py-2"><code>stopwords</code></td>
+                            <td class="px-4 py-2">set</td>
+                            <td class="px-4 py-2">STOPWORDS</td>
+                            <td class="px-4 py-2">Words to exclude</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Code Examples -->
+        <div class="mt-12 bg-gray-900 rounded-lg p-8 text-white">
+            <h2 class="text-2xl font-bold mb-6">
+                <i class="fas fa-code mr-2"></i>API Usage Examples
+            </h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Basic Generation</h3>
+                    <pre class="code-block p-4 rounded overflow-x-auto"><code>from wordcloud import WordCloud
+
+# Generate from text
+wordcloud = WordCloud(width=800, height=400).generate(text)
+wordcloud.to_file("output.png")</code></pre>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Custom Colors</h3>
+                    <pre class="code-block p-4 rounded overflow-x-auto"><code># Use matplotlib colormap
+wordcloud = WordCloud(colormap='viridis').generate(text)
+
+# Use custom color function
+def custom_color_func(word, **kwargs):
+    return f"hsl({random.randint(0, 360)}, 70%, 50%)"
+    
+wordcloud = WordCloud(color_func=custom_color_func).generate(text)</code></pre>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Shape Masks</h3>
+                    <pre class="code-block p-4 rounded overflow-x-auto"><code># Use custom shape
+from PIL import Image
+import numpy as np
+
+mask = np.array(Image.open("shape.png"))
+wordcloud = WordCloud(mask=mask, contour_width=3).generate(text)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-indigo-600">24</div>
+                <div class="text-gray-600">Total Parameters</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-purple-600">60+</div>
+                <div class="text-gray-600">Color Schemes</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-green-600">40+</div>
+                <div class="text-gray-600">Shape Masks</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-orange-600">4</div>
+                <div class="text-gray-600">Export Formats</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-12 text-center text-gray-600">
+            <p class="mb-2">WordCloud Studio implements all features from the word_cloud library</p>
+            <p>Created with ❤️ by temp188.com</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Schemes Showcase - WordCloud Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .color-preview {
+            height: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gradient-preview {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+                <div>
+                    <span class="text-gray-600">{{ total_schemes }} Color Schemes Available</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-4">Complete Color Schemes Collection</h1>
+            <p class="text-gray-600 text-lg">All matplotlib colormaps available for your word clouds</p>
+            <div class="mt-4 bg-blue-50 rounded-lg p-4 max-w-2xl mx-auto">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Powered by the word_cloud library by Andreas Mueller
+                    <a href="https://github.com/amueller/word_cloud" class="underline ml-2" target="_blank">
+                        github.com/amueller/word_cloud
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        {% for category, schemes in schemes_by_category.items() %}
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                <i class="fas fa-palette mr-2"></i>{{ category }} Colormaps
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {% for scheme in schemes %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="color-preview" style="background-color: {{ scheme.background }}">
+                        <div class="gradient-preview" id="gradient-{{ scheme.name }}"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg">{{ scheme.name|title }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Colormap: {{ scheme.colormap }}
+                        </p>
+                        <button onclick="selectColorScheme('{{ scheme.name }}')" 
+                                class="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded text-sm transition-colors">
+                            Use This Scheme
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Custom Color Functions Section -->
+        <div class="mt-12 bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6">
+                <i class="fas fa-code mr-2"></i>Custom Color Functions
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold mb-2">Grey Variations</h3>
+                    <p class="text-sm text-gray-600">Random grey shades for each word</p>
+                </div>
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold mb-2">Single Color Variations</h3>
+                    <p class="text-sm text-gray-600">Single hue with brightness variations</p>
+                </div>
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold mb-2">Rainbow by Position</h3>
+                    <p class="text-sm text-gray-600">Color changes based on word position</p>
+                </div>
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold mb-2">Size-based Coloring</h3>
+                    <p class="text-sm text-gray-600">Larger words get darker colors</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attribution -->
+        <div class="mt-12 text-center text-gray-600">
+            <p class="mb-2">WordCloud library licensed under MIT License</p>
+            <p>Color schemes from matplotlib library</p>
+        </div>
+    </div>
+
+    <script>
+        // Generate gradient previews for each colormap
+        const colormaps = {
+            // Sequential
+            'viridis': ['#440154', '#31688e', '#35b779', '#fde725'],
+            'plasma': ['#0d0887', '#6a00a8', '#b12a90', '#e16462', '#fca636', '#f0f921'],
+            'inferno': ['#000004', '#420a68', '#932667', '#dd513a', '#fca50a', '#fcffa4'],
+            'magma': ['#000004', '#3b0f70', '#8c2981', '#de4968', '#fe9f6d', '#fcfdbf'],
+            'cividis': ['#00224e', '#123570', '#3b496c', '#575d6d', '#707173', '#8a8678', '#a59c74', '#c3b369', '#e1cc55', '#fee838'],
+            
+            // Single hue
+            'blues': ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'],
+            'greens': ['#f7fcf5', '#e5f5e0', '#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b'],
+            'reds': ['#fff5f0', '#fee0d2', '#fcbba1', '#fc9272', '#fb6a4a', '#ef3b2c', '#cb181d', '#a50f15', '#67000d'],
+            'purples': ['#fcfbfd', '#efedf5', '#dadaeb', '#bcbddc', '#9e9ac8', '#807dba', '#6a51a3', '#54278f', '#3f007d'],
+            'oranges': ['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c', '#f16913', '#d94801', '#a63603', '#7f2704'],
+            'greys': ['#ffffff', '#f0f0f0', '#d9d9d9', '#bdbdbd', '#969696', '#737373', '#525252', '#252525', '#000000'],
+            
+            // Multi-hue
+            'turbo': ['#30123b', '#4145ab', '#4675ed', '#39a2fc', '#1bcfd4', '#24ed82', '#6dda3c', '#c4e11f', '#fec418', '#f47918', '#d33b17', '#a01813'],
+            'ylgnbu': ['#ffffd9', '#edf8b1', '#c7e9b4', '#7fcdbb', '#41b6c4', '#1d91c0', '#225ea8', '#253494', '#081d58'],
+            'ylorbr': ['#ffffe5', '#fff7bc', '#fee391', '#fec44f', '#fe9929', '#ec7014', '#cc4c02', '#993404', '#662506'],
+            
+            // Diverging
+            'rdylbu': ['#a50026', '#d73027', '#f46d43', '#fdae61', '#fee090', '#ffffbf', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695'],
+            'spectral': ['#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'],
+            'coolwarm': ['#3b4cc0', '#6788ee', '#9abbff', '#c9d7f0', '#edd1c2', '#f7a889', '#e26952', '#b40426'],
+            'bwr': ['#0000ff', '#4040ff', '#8080ff', '#c0c0ff', '#ffffff', '#ffc0c0', '#ff8080', '#ff4040', '#ff0000'],
+            
+            // Qualitative
+            'set3': ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd', '#ccebc5', '#ffed6f'],
+            'tab10': ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'],
+            
+            // Cyclic
+            'hsv': ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff', '#ff0000'],
+            'twilight': ['#e2d9e2', '#9ebbc9', '#4f8fc4', '#2e5a87', '#2e2e5a', '#5a2e5a', '#875a87', '#c48fc4', '#e2d9e2'],
+            
+            // Special
+            'ocean': ['#008000', '#004c66', '#003380', '#1a1a99', '#3333b3', '#4d4dcc', '#6666e6', '#8080ff'],
+            'rainbow': ['#ff0000', '#ff8000', '#ffff00', '#80ff00', '#00ff00', '#00ff80', '#00ffff', '#0080ff', '#0000ff', '#8000ff', '#ff00ff', '#ff0080'],
+            'jet': ['#000080', '#0000ff', '#0080ff', '#00ffff', '#80ff80', '#ffff00', '#ff8000', '#ff0000', '#800000'],
+            
+            // Temperature
+            'hot': ['#0b0000', '#4b0000', '#8b0000', '#cb0000', '#ff2400', '#ff6400', '#ffa400', '#ffe400', '#ffff00', '#ffff80', '#ffffff'],
+            'cool': ['#00ffff', '#19f3ff', '#33e6ff', '#4dd9ff', '#66ccff', '#80bfff', '#99b3ff', '#b3a6ff', '#cc99ff', '#e68cff', '#ff80ff'],
+            
+            // Seasonal
+            'spring': ['#ff00ff', '#ff08ff', '#ff10ff', '#ff18ff', '#ff20ff', '#ff28ff', '#ff30ff', '#ff38ff', '#ff40ff'],
+            'summer': ['#008066', '#198c66', '#339966', '#4da666', '#66b366', '#80c066', '#99cc66', '#b3d966', '#cce666', '#e6f366', '#ffff66'],
+            'autumn': ['#ff0000', '#ff1100', '#ff2200', '#ff3300', '#ff4400', '#ff5500', '#ff6600', '#ff7700', '#ff8800', '#ff9900', '#ffaa00', '#ffbb00', '#ffcc00', '#ffdd00', '#ffee00', '#ffff00'],
+            'winter': ['#0000ff', '#0010ff', '#0020ff', '#0030ff', '#0040ff', '#0050ff', '#0060ff', '#0070ff', '#0080ff', '#0090ff', '#00a0ff', '#00b0ff', '#00c0ff', '#00d0ff', '#00e0ff', '#00f0ff', '#00ffff']
+        };
+
+        // Create gradient for each colormap
+        document.addEventListener('DOMContentLoaded', function() {
+            Object.keys(colormaps).forEach(name => {
+                const elem = document.getElementById('gradient-' + name);
+                if (elem && colormaps[name]) {
+                    const colors = colormaps[name];
+                    const gradient = `linear-gradient(to right, ${colors.join(', ')})`;
+                    elem.style.background = gradient;
+                }
+            });
+        });
+
+        function selectColorScheme(schemeName) {
+            // Store selected scheme and redirect to appropriate generator
+            localStorage.setItem('selectedColorScheme', schemeName);
+            window.location.href = "{{ url_for('wordcloud.quick_generator') }}";
+        }
+    </script>
+</body>
+</html>

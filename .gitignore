@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+instance/
+.pytest_cache/
+.coverage
+.env
+
+# Flask
+instance/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Generated files
+temp_wordclouds/
+static/wordclouds/
+static/uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.secrets/
+config.py
+secrets.py
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Uploaded files
+uploads/

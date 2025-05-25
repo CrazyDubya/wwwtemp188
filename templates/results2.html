@@ -1,0 +1,19 @@
+<section class="bg-white p-8 rounded-lg shadow-lg mt-8">
+    <h2 class="text-2xl font-bold text-gray-800">Word Clouds</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
+        {% for wordcloud in wordclouds %}
+        <div class="text-center">
+            <img src="{{ url_for('uploaded_file', generation_id=generation_id, filename=wordcloud) }}" class="shadow-lg rounded-lg max-w-full h-auto">
+            <a href="{{ url_for('uploaded_file', generation_id=generation_id, filename=wordcloud) }}" download="{{ wordcloud }}" class="block mt-4 text-blue-500">Download</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="bg-white p-8 rounded-lg shadow-lg mt-8">
+    <h2 class="text-2xl font-bold text-gray-800">Top 25 Most Common Words</h2>
+    <div class="text-center mt-6">
+        <img src="{{ url_for('uploaded_file', generation_id=generation_id, filename=chart) }}" class="shadow-lg rounded-lg max-w-full h-auto">
+        <a href="{{ url_for('uploaded_file', generation_id=generation_id, filename=chart) }}" download="{{ chart }}" class="block mt-4 text-blue-500">Download</a>
+    </div>
+</section>

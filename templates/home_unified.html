@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>temp188.com - Creative Tools Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5046e5;
+            --primary-dark: #4338ca;
+            --secondary: #0ea5e9;
+            --accent: #f97316;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        .project-card {
+            transition: all 0.3s ease;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .animated-gradient {
+            background: linear-gradient(-45deg, #5046e5, #0ea5e9, #8b5cf6, #3b82f6);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm fixed w-full top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-indigo-600">
+                        <i class="fas fa-rocket mr-2"></i>temp188
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="#projects" class="text-gray-600 hover:text-indigo-600 font-medium">Projects</a>
+                    <a href="#about" class="text-gray-600 hover:text-indigo-600 font-medium">About</a>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard.index') }}" class="text-gray-600 hover:text-indigo-600 font-medium">
+                            <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+                        </a>
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 text-gray-700">
+                                {% if current_user.avatar_url %}
+                                    <img src="{{ current_user.avatar_url }}" alt="Avatar" class="w-8 h-8 rounded-full">
+                                {% else %}
+                                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white">
+                                        {{ current_user.username[0].upper() }}
+                                    </div>
+                                {% endif %}
+                                <span>{{ current_user.username }}</span>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
+                                <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </a>
+                                <a href="{{ url_for('dashboard.settings') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-cog mr-2"></i>Settings
+                                </a>
+                                {% if current_user.role == 'admin' %}
+                                <a href="{{ url_for('dashboard.admin') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-shield-alt mr-2"></i>Admin
+                                </a>
+                                {% endif %}
+                                <hr class="my-1">
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
+                        <a href="{{ url_for('auth.signup') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                            Sign Up Free
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="animated-gradient text-white pt-32 pb-20">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-5xl md:text-6xl font-bold mb-6 floating">
+                    Your Creative Tools Hub
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-indigo-100">
+                    Powerful web-based tools for content creation, data visualization, and creative projects
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#projects" class="bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold text-lg hover-scale">
+                        Explore Tools
+                    </a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.signup') }}" class="bg-transparent border-2 border-white px-8 py-4 rounded-lg font-bold text-lg hover-scale">
+                        Create Free Account
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Available Tools</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for project in projects %}
+                <div class="project-card bg-white rounded-xl shadow-lg overflow-hidden {% if project.get('disabled') %}opacity-60{% endif %}">
+                    <div class="h-2 bg-{{ project.color }}-600"></div>
+                    <div class="p-8">
+                        <div class="w-16 h-16 bg-{{ project.color }}-100 rounded-full flex items-center justify-center mb-4 text-{{ project.color }}-600">
+                            <i class="fas {{ project.icon }} text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">{{ project.name }}</h3>
+                        <p class="text-gray-600 mb-6">{{ project.description }}</p>
+                        
+                        {% if project.features %}
+                        <ul class="space-y-2 mb-6">
+                            {% for feature in project.features %}
+                            <li class="flex items-center text-gray-700">
+                                <i class="fas fa-check text-{{ project.color }}-600 mr-2"></i>
+                                <span>{{ feature }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        
+                        {% if not project.get('disabled') %}
+                        <a href="{{ project.url }}" class="block text-center bg-{{ project.color }}-600 hover:bg-{{ project.color }}-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                            Launch {{ project.name }}
+                        </a>
+                        {% else %}
+                        <div class="text-center bg-gray-300 text-gray-600 font-bold py-3 px-4 rounded-lg cursor-not-allowed">
+                            Coming Soon
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Why Choose temp188?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-bolt text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Fast & Reliable</h3>
+                    <p class="text-gray-600">
+                        Server-side processing ensures quick results without taxing your device
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-lock text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Secure & Private</h3>
+                    <p class="text-gray-600">
+                        Your data is protected with industry-standard security measures
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-users text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Community Driven</h3>
+                    <p class="text-gray-600">
+                        Built by creators for creators, with continuous improvements
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-4xl font-bold mb-8">About temp188</h2>
+                <p class="text-xl text-gray-600 mb-6">
+                    temp188.com is a growing platform of creative and productivity tools designed to help you bring your ideas to life. Starting with our powerful WordCloud Studio, we're continuously adding new tools based on community feedback and needs.
+                </p>
+                <p class="text-lg text-gray-600 mb-8">
+                    Whether you're a content creator, educator, marketer, or just someone who loves to visualize data in creative ways, our tools are designed to be intuitive, powerful, and accessible to everyone.
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <a href="https://github.com" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fab fa-github text-2xl"></i>
+                    </a>
+                    <a href="https://twitter.com" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Get Started?</h2>
+            <p class="text-xl mb-8 text-indigo-100">
+                Join thousands of creators using temp188 tools every day
+            </p>
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('auth.signup') }}" class="bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold text-lg hover-scale inline-block">
+                Create Your Free Account
+            </a>
+            {% else %}
+            <a href="{{ url_for('dashboard.index') }}" class="bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold text-lg hover-scale inline-block">
+                Go to Dashboard
+            </a>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between mb-8">
+                <div class="mb-8 md:mb-0">
+                    <a href="/" class="text-2xl font-bold text-white">
+                        <i class="fas fa-rocket mr-2"></i>temp188
+                    </a>
+                    <p class="mt-4 max-w-md">
+                        A creative tools platform for makers, creators, and innovators.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-white font-bold mb-4">Tools</h3>
+                        <ul class="space-y-2">
+                            <li><a href="/wordcloud" class="hover:text-white">WordCloud Studio</a></li>
+                            <li><a href="#" class="hover:text-white opacity-60">More Coming Soon</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-4">Account</h3>
+                        <ul class="space-y-2">
+                            {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('dashboard.index') }}" class="hover:text-white">Dashboard</a></li>
+                            <li><a href="{{ url_for('auth.profile') }}" class="hover:text-white">Profile</a></li>
+                            {% else %}
+                            <li><a href="{{ url_for('auth.signup') }}" class="hover:text-white">Sign Up</a></li>
+                            <li><a href="{{ url_for('auth.login') }}" class="hover:text-white">Login</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-white font-bold mb-4">Resources</h3>
+                        <ul class="space-y-2">
+                            <li><a href="{{ url_for('about') }}" class="hover:text-white">About</a></li>
+                            <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 mt-8 text-center">
+                <p>&copy; 2025 temp188.com | All rights reserved</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

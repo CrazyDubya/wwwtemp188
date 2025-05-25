@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Word Cloud Generator - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8">Quick Word Cloud Generator</h1>
+            
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <form method="POST" action="{{ url_for('wordcloud.quick_generate') }}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Words Input -->
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2">
+                                <i class="fas fa-font mr-2"></i>Enter Words (one per line)
+                            </label>
+                            <textarea name="words" rows="15" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                                    placeholder="Freedom&#10;Democracy&#10;Liberty&#10;Justice&#10;Peace"></textarea>
+                        </div>
+                        
+                        <!-- Weights Input -->
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2">
+                                <i class="fas fa-weight mr-2"></i>Weights (optional, one per line)
+                            </label>
+                            <textarea name="weights" rows="15"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                                    placeholder="10&#10;8&#10;6&#10;5&#10;3"></textarea>
+                            <p class="text-sm text-gray-600 mt-2">
+                                Higher numbers = larger words. Default weight is 5.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Color Scheme Selection -->
+                    <div class="mt-6">
+                        <label class="block text-gray-700 font-bold mb-3">
+                            <i class="fas fa-palette mr-2"></i>Choose Color Scheme
+                        </label>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="patriotic" checked class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #ff0000, #ffffff, #0000ff)"></div>
+                                    <span class="text-sm">Patriotic</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="ocean" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #000080, #4169e1, #87ceeb)"></div>
+                                    <span class="text-sm">Ocean</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="sunset" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #ff4500, #ff8c00, #ffd700)"></div>
+                                    <span class="text-sm">Sunset</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="forest" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #228b22, #32cd32, #90ee90)"></div>
+                                    <span class="text-sm">Forest</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="galaxy" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #4b0082, #8a2be2, #da70d6)"></div>
+                                    <span class="text-sm">Galaxy</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="autumn" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #8b4513, #ff8c00, #ffff00)"></div>
+                                    <span class="text-sm">Autumn</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="neon" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #ff1493, #00ff00, #00ffff)"></div>
+                                    <span class="text-sm">Neon</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="pastel" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #ffb6c1, #ffd1dc, #e6e6fa)"></div>
+                                    <span class="text-sm">Pastel</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="monochrome" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, #000000, #808080, #ffffff)"></div>
+                                    <span class="text-sm">Monochrome</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color_scheme" value="rainbow" class="sr-only peer">
+                                <div class="p-3 border-2 rounded-lg text-center peer-checked:border-indigo-500 peer-checked:bg-indigo-50 hover:bg-gray-50">
+                                    <div class="h-8 w-full mb-2 rounded" style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)"></div>
+                                    <span class="text-sm">Rainbow</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- View All Colors Link -->
+                    <div class="mt-4 text-center">
+                        <a href="{{ url_for('wordcloud.color_showcase') }}" 
+                           class="text-indigo-600 hover:text-indigo-800 font-medium">
+                            <i class="fas fa-palette mr-2"></i>Browse All 60+ Color Schemes
+                        </a>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <button type="submit" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg transform transition hover:scale-105">
+                            <i class="fas fa-magic mr-2"></i>Generate Word Clouds
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Info Section -->
+            <div class="mt-8 bg-blue-50 rounded-lg p-6">
+                <h3 class="font-bold text-lg mb-2">
+                    <i class="fas fa-info-circle mr-2"></i>How it Works
+                </h3>
+                <ul class="space-y-2 text-gray-700">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Enter your words in the left column</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Optionally add weights to make some words bigger</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>We'll generate 3 variations in red, white, and blue themes</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>Download your favorite version instantly</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check if a color scheme was pre-selected from the showcase
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedScheme = localStorage.getItem('selectedColorScheme');
+            if (selectedScheme) {
+                // Find and check the radio button
+                const schemeRadio = document.querySelector(`input[name="color_scheme"][value="${selectedScheme}"]`);
+                if (schemeRadio) {
+                    schemeRadio.checked = true;
+                }
+                // Clear the storage
+                localStorage.removeItem('selectedColorScheme');
+                
+                // Show a notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                notification.innerHTML = `<i class="fas fa-check-circle mr-2"></i>Color scheme "${selectedScheme}" selected!`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

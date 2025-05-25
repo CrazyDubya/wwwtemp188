@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP WordCloud Generator - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .form-group { margin-bottom: 1.5rem; }
+        .colormap-preview { width: 100%; height: 30px; border-radius: 4px; }
+        .loading { display: none; }
+        .loading.show { display: flex; }
+        
+        /* Color scheme previews */
+        .viridis { background: linear-gradient(to right, #440154, #482878, #3e4989, #31688e, #26828e, #1f9e89, #35b779, #6ece58, #b5de2b, #fde725); }
+        .plasma { background: linear-gradient(to right, #0d0887, #41049d, #6a00a8, #8f0da4, #b12a90, #cc4778, #e16462, #f0844c, #fca636, #fcce25, #f0f921); }
+        .inferno { background: linear-gradient(to right, #000004, #1b0c42, #4a0c6b, #781c6d, #a52c60, #cf4446, #ed6925, #fb9b06, #f7d13d, #fcffa4); }
+        .magma { background: linear-gradient(to right, #000004, #180f3d, #440f76, #721f81, #9e2f7f, #cb4678, #ee6a59, #fb9b3a, #fece2f, #fcfdbf); }
+        .cividis { background: linear-gradient(to right, #00204c, #00306e, #145d8c, #447596, #699da9, #8fc1bb, #b4e0bd, #d6f9cf, #fafdda); }
+        .RdBu { background: linear-gradient(to right, #67001f, #b2182b, #d6604d, #f4a582, #fddbc7, #f7f7f7, #d1e5f0, #92c5de, #4393c3, #2166ac, #053061); }
+        .coolwarm { background: linear-gradient(to right, #3b4cc0, #6688db, #88b1df, #a9d4ec, #cfeef5, #f0f0f0, #f9d1c9, #f1a185, #de6a53, #b7312c, #7a0025); }
+        .Blues { background: linear-gradient(to right, #f7fbff, #deebf7, #c6dbef, #9ecae1, #6baed6, #4292c6, #2171b5, #08519c, #08306b); }
+        
+        /* Range slider styles */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0066cc;
+            cursor: pointer;
+        }
+        
+        /* Navigation menu */
+        nav { background-color: #333; }
+        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; }
+        nav li { margin: 0; padding: 0; }
+        nav a { color: white; text-decoration: none; padding: 15px 20px; display: block; transition: background-color 0.3s; }
+        nav a:hover, nav a.active { background-color: #0066cc; }
+        nav a.active { font-weight: bold; }
+        
+        /* Responsive Menu */
+        .menu-toggle { display: none; background: none; border: none; font-size: 20px; color: white; cursor: pointer; padding: 15px; }
+        
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            nav ul { flex-direction: column; display: none; }
+            nav ul.show { display: flex; }
+            nav li { width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-700 text-white py-6 px-4 text-center">
+        <h1 class="text-3xl font-bold">MCP WordCloud Generator</h1>
+        <p class="mt-2">Advanced wordcloud generation with server-side processing</p>
+    </header>
+    
+    <nav>
+        <button class="menu-toggle">☰</button>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/new_cloud_gen.html">Client-Side WordCloud</a></li>
+            <li><a href="/mcp/wordcloud" class="active">MCP WordCloud</a></li>
+            <li><a href="/cloud/">Cloud WordCloud</a></li>
+            <li><a href="/mcp/dashboard">Dashboard</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4 text-blue-700 border-b pb-2">Generate Your WordCloud</h2>
+            <p class="mb-6 text-gray-700">
+                This advanced wordcloud generator processes your text on our servers. Your results will be accessible through a secure token
+                for one hour after generation. No data is permanently stored.
+            </p>
+            
+            <form id="wordcloud-form" action="/mcp/wordcloud/generate" method="post" enctype="multipart/form-data" class="space-y-6">
+                <div class="form-group">
+                    <label for="text" class="block font-semibold mb-2 text-gray-700">Enter your text:</label>
+                    <textarea id="text" name="text" rows="8" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Paste your text here (minimum 50 characters)..."></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Basic Settings -->
+                    <div class="p-4 border border-gray-200 rounded-md bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Basic Settings</h3>
+                        
+                        <div class="form-group">
+                            <label for="max_words" class="block font-medium mb-1 text-gray-700">Maximum Words:</label>
+                            <div class="flex items-center">
+                                <input type="range" id="max_words" name="max_words" min="50" max="500" value="200" 
+                                    class="flex-grow mr-3">
+                                <span id="max_words_value" class="text-gray-700 w-12 text-center">200</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="min_word_length" class="block font-medium mb-1 text-gray-700">Minimum Word Length:</label>
+                            <div class="flex items-center">
+                                <input type="range" id="min_word_length" name="min_word_length" min="1" max="8" value="3" 
+                                    class="flex-grow mr-3">
+                                <span id="min_word_length_value" class="text-gray-700 w-12 text-center">3</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="additional_stopwords" class="block font-medium mb-1 text-gray-700">Additional Stop Words:</label>
+                            <input type="text" id="additional_stopwords" name="additional_stopwords" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="word1, word2, word3">
+                            <p class="text-xs text-gray-500 mt-1">Comma-separated words to exclude</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Settings -->
+                    <div class="p-4 border border-gray-200 rounded-md bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Size Settings</h3>
+                        
+                        <div class="form-group">
+                            <label for="width" class="block font-medium mb-1 text-gray-700">Width (pixels):</label>
+                            <div class="flex items-center">
+                                <input type="range" id="width" name="width" min="500" max="2000" step="100" value="1000" 
+                                    class="flex-grow mr-3">
+                                <span id="width_value" class="text-gray-700 w-12 text-center">1000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="height" class="block font-medium mb-1 text-gray-700">Height (pixels):</label>
+                            <div class="flex items-center">
+                                <input type="range" id="height" name="height" min="300" max="1500" step="100" value="600" 
+                                    class="flex-grow mr-3">
+                                <span id="height_value" class="text-gray-700 w-12 text-center">600</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="font" class="block font-medium mb-1 text-gray-700">Font:</label>
+                            <select id="font" name="font" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                {% for font in available_fonts %}
+                                <option value="{{ font }}">{{ font }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Mask Settings -->
+                    <div class="p-4 border border-gray-200 rounded-md bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-3 text-blue-600">Shape Mask</h3>
+                        
+                        <div class="form-group">
+                            <label for="mask_option" class="block font-medium mb-1 text-gray-700">Mask Shape:</label>
+                            <select id="mask_option" name="mask_option" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                {% for key, value in sample_masks.items() %}
+                                <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div id="mask_file_container" class="form-group hidden">
+                            <label for="mask_file" class="block font-medium mb-1 text-gray-700">Upload Mask Image:</label>
+                            <input type="file" id="mask_file" name="mask_file" accept=".png,.jpg,.jpeg,.gif" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Black and white images work best</p>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="invert_mask" name="invert_mask" value="true" 
+                                    class="mr-2 h-5 w-5 text-blue-600">
+                                <span class="text-gray-700">Invert Mask Colors</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Color Scheme Settings -->
+                <div class="p-4 border border-gray-200 rounded-md bg-gray-50 mt-6">
+                    <h3 class="text-lg font-semibold mb-3 text-blue-600">Color Schemes</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- WordCloud 1 Colors -->
+                        <div class="form-group">
+                            <label for="colormap1" class="block font-medium mb-1 text-gray-700">WordCloud 1 Color Scheme:</label>
+                            <select id="colormap1" name="colormap1" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <optgroup label="Standard">
+                                    {% for scheme in color_schemes.standard %}
+                                    <option value="{{ scheme }}" {% if scheme == 'viridis' %}selected{% endif %}>{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Diverging">
+                                    {% for scheme in color_schemes.diverging %}
+                                    <option value="{{ scheme }}">{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Qualitative">
+                                    {% for scheme in color_schemes.qualitative %}
+                                    <option value="{{ scheme }}">{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            </select>
+                            <div id="colormap1_preview" class="mt-2 colormap-preview viridis"></div>
+                            
+                            <label for="background1" class="block font-medium mb-1 text-gray-700 mt-3">Background Color:</label>
+                            <select id="background1" name="background1" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="black" selected>Black</option>
+                                <option value="white">White</option>
+                                <option value="#f5f5f5">Light Gray</option>
+                                <option value="#333333">Dark Gray</option>
+                                <option value="#000080">Navy Blue</option>
+                                <option value="#800000">Maroon</option>
+                                <option value="#006400">Dark Green</option>
+                            </select>
+                        </div>
+                        
+                        <!-- WordCloud 2 Colors -->
+                        <div class="form-group">
+                            <label for="colormap2" class="block font-medium mb-1 text-gray-700">WordCloud 2 Color Scheme:</label>
+                            <select id="colormap2" name="colormap2" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <optgroup label="Standard">
+                                    {% for scheme in color_schemes.standard %}
+                                    <option value="{{ scheme }}" {% if scheme == 'plasma' %}selected{% endif %}>{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Diverging">
+                                    {% for scheme in color_schemes.diverging %}
+                                    <option value="{{ scheme }}">{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Qualitative">
+                                    {% for scheme in color_schemes.qualitative %}
+                                    <option value="{{ scheme }}">{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            </select>
+                            <div id="colormap2_preview" class="mt-2 colormap-preview plasma"></div>
+                            
+                            <label for="background2" class="block font-medium mb-1 text-gray-700 mt-3">Background Color:</label>
+                            <select id="background2" name="background2" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="black">Black</option>
+                                <option value="white" selected>White</option>
+                                <option value="#f5f5f5">Light Gray</option>
+                                <option value="#333333">Dark Gray</option>
+                                <option value="#000080">Navy Blue</option>
+                                <option value="#800000">Maroon</option>
+                                <option value="#006400">Dark Green</option>
+                            </select>
+                        </div>
+                        
+                        <!-- WordCloud 3 Colors -->
+                        <div class="form-group">
+                            <label for="colormap3" class="block font-medium mb-1 text-gray-700">WordCloud 3 Color Scheme:</label>
+                            <select id="colormap3" name="colormap3" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <optgroup label="Standard">
+                                    {% for scheme in color_schemes.standard %}
+                                    <option value="{{ scheme }}" {% if scheme == 'inferno' %}selected{% endif %}>{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Diverging">
+                                    {% for scheme in color_schemes.diverging %}
+                                    <option value="{{ scheme }}">{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Qualitative">
+                                    {% for scheme in color_schemes.qualitative %}
+                                    <option value="{{ scheme }}">{{ scheme }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            </select>
+                            <div id="colormap3_preview" class="mt-2 colormap-preview inferno"></div>
+                            
+                            <label for="background3" class="block font-medium mb-1 text-gray-700 mt-3">Background Color:</label>
+                            <select id="background3" name="background3" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="black">Black</option>
+                                <option value="white">White</option>
+                                <option value="#f5f5f5">Light Gray</option>
+                                <option value="#333333" selected>Dark Gray</option>
+                                <option value="#000080">Navy Blue</option>
+                                <option value="#800000">Maroon</option>
+                                <option value="#006400">Dark Green</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center mt-6">
+                    <button type="submit" id="generate-btn" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md shadow-md transition duration-300 transform hover:scale-105">
+                        Generate WordClouds
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loading" class="loading bg-white shadow-md rounded-lg p-6 text-center items-center justify-center flex-col">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
+            <p class="text-lg font-medium text-gray-700">Generating your WordClouds...</p>
+            <p class="text-sm text-gray-500">This may take a few moments depending on the size of your text and selected options.</p>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-white py-6 px-4 text-center mt-10">
+        <p>&copy; 2025 temp188.com - MCP WordCloud Generator</p>
+        <p class="text-sm text-gray-400 mt-2">Secure server-side processing with temporary access tokens.</p>
+        <p class="text-xs text-gray-500 mt-3">Powered by <a href="https://github.com/amueller/word_cloud" class="underline hover:text-blue-300" target="_blank">word_cloud</a> - WordCloud generator by Andreas Mueller</p>
+    </footer>
+
+    <script>
+        // Handle range input displays
+        document.querySelectorAll('input[type="range"]').forEach(range => {
+            const valueDisplay = document.getElementById(`${range.id}_value`);
+            range.addEventListener('input', () => {
+                valueDisplay.textContent = range.value;
+            });
+        });
+        
+        // Toggle mask file upload based on selection
+        document.getElementById('mask_option').addEventListener('change', function() {
+            const maskFileContainer = document.getElementById('mask_file_container');
+            if (this.value === 'upload') {
+                maskFileContainer.classList.remove('hidden');
+            } else {
+                maskFileContainer.classList.add('hidden');
+            }
+        });
+        
+        // Update colormap previews
+        document.querySelectorAll('select[id^="colormap"]').forEach(select => {
+            const preview = document.getElementById(`${select.id}_preview`);
+            select.addEventListener('change', () => {
+                // Remove all current classes
+                preview.className = 'mt-2 colormap-preview';
+                // Add the selected colormap class
+                preview.classList.add(select.value);
+            });
+        });
+        
+        // Form submission with loading indicator
+        document.getElementById('wordcloud-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Basic validation
+            const text = document.getElementById('text').value.trim();
+            if (text.length < 50) {
+                alert('Please enter at least 50 characters of text.');
+                return false;
+            }
+            
+            // Show loading indicator
+            document.getElementById('loading').classList.add('show');
+            
+            // Submit form via AJAX
+            const formData = new FormData(this);
+            
+            fetch('/mcp/wordcloud/generate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    document.getElementById('loading').classList.remove('show');
+                } else if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                document.getElementById('loading').classList.remove('show');
+            });
+        });
+        
+        // Menu toggle functionality
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('nav ul').classList.toggle('show');
+        });
+    </script>
+</body>
+</html>

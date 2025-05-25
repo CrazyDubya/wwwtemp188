@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Word Clouds - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">My Word Clouds</h1>
+        
+        {% if clouds %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for cloud in clouds %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div class="aspect-w-16 aspect-h-9 bg-gray-100">
+                    <img src="{{ cloud.file_path }}" 
+                         alt="{{ cloud.title }}" 
+                         class="object-cover w-full h-48">
+                </div>
+                <div class="p-4">
+                    <h3 class="font-semibold text-lg mb-1">{{ cloud.title }}</h3>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">
+                            {{ cloud.cloud_type|title }}
+                        </span>
+                        <span class="text-xs text-gray-500">
+                            {{ cloud.created_at.strftime('%m/%d/%Y') }}
+                        </span>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="{{ url_for('wordcloud.download', filename=cloud.file_path.split('/')[-1]) }}" 
+                           class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded text-sm">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </a>
+                        <form method="POST" action="{{ url_for('wordcloud.delete_cloud', cloud_id=cloud.id) }}" 
+                              onsubmit="return confirm('Are you sure you want to delete this word cloud?')"
+                              class="flex-1">
+                            <button type="submit" 
+                                    class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded text-sm">
+                                <i class="fas fa-trash mr-1"></i>Delete
+                            </button>
+                        </form>
+                    </div>
+                    {% if not cloud.is_public %}
+                    <div class="mt-2">
+                        <button onclick="alert('Make public feature coming soon!')" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm">
+                            <i class="fas fa-share mr-1"></i>Make Public
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-cloud text-6xl text-gray-300 mb-4"></i>
+            <p class="text-xl text-gray-600">You haven't created any word clouds yet</p>
+            <p class="text-gray-500 mt-2">Start creating beautiful word clouds now!</p>
+            <a href="{{ url_for('wordcloud.index') }}" 
+               class="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg">
+                Create Your First Word Cloud
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

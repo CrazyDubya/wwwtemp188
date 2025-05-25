@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Word Cloud Studio - temp188.com</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .slider-value {
+            min-width: 3rem;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('wordcloud.index') }}" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to WordCloud Studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8">Advanced Word Cloud Studio</h1>
+            
+            <form method="POST" action="{{ url_for('wordcloud.studio_generate') }}" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Column: Text Input -->
+                    <div class="space-y-6">
+                        <!-- Text Input -->
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <label class="block text-gray-700 font-bold mb-3">
+                                <i class="fas fa-file-alt mr-2"></i>Text Source
+                            </label>
+                            <textarea name="text" rows="10"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+                                    placeholder="Paste your text here..."></textarea>
+                            
+                            <div class="mt-4">
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    <i class="fas fa-upload mr-2"></i>Or Upload Text File
+                                </label>
+                                <input type="file" name="text_file" accept=".txt,.csv,.doc,.docx" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+
+                        <!-- Text Processing -->
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4">
+                                <i class="fas fa-cogs mr-2"></i>Text Processing
+                            </h3>
+                            
+                            <div class="space-y-3">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="include_numbers" value="true" class="form-checkbox text-indigo-600">
+                                    <span class="ml-2">Include numbers</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="collocations" value="true" checked class="form-checkbox text-indigo-600">
+                                    <span class="ml-2">Find collocations (paired words)</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="normalize_plurals" value="true" class="form-checkbox text-indigo-600">
+                                    <span class="ml-2">Normalize plurals</span>
+                                </label>
+                                <br>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="repeat" value="true" class="form-checkbox text-indigo-600">
+                                    <span class="ml-2">Allow word repetition</span>
+                                </label>
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    Minimum Word Length
+                                </label>
+                                <input type="number" name="min_word_length" value="3" min="1" max="10"
+                                       class="w-24 px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+
+                            <div class="mt-4">
+                                <label class="block text-gray-700 font-semibold mb-2">
+                                    Additional Stopwords (comma-separated)
+                                </label>
+                                <input type="text" name="stopwords" 
+                                       placeholder="word1, word2, word3"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Visual Settings -->
+                    <div class="space-y-6">
+                        <!-- Dimensions -->
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4">
+                                <i class="fas fa-ruler-combined mr-2"></i>Dimensions
+                            </h3>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Width</label>
+                                    <input type="number" name="width" value="1600" min="400" max="3200"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Height</label>
+                                    <input type="number" name="height" value="900" min="300" max="2400"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Typography -->
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4">
+                                <i class="fas fa-font mr-2"></i>Typography
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Max Words</label>
+                                    <div class="slider-container">
+                                        <input type="range" name="max_words" min="50" max="500" value="200" 
+                                               oninput="this.nextElementSibling.textContent = this.value"
+                                               class="flex-1">
+                                        <span class="slider-value">200</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Min Font Size</label>
+                                    <div class="slider-container">
+                                        <input type="range" name="min_font_size" min="2" max="20" value="4"
+                                               oninput="this.nextElementSibling.textContent = this.value"
+                                               class="flex-1">
+                                        <span class="slider-value">4</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Max Font Size</label>
+                                    <div class="slider-container">
+                                        <input type="range" name="max_font_size" min="50" max="300" value="150"
+                                               oninput="this.nextElementSibling.textContent = this.value"
+                                               class="flex-1">
+                                        <span class="slider-value">150</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Prefer Horizontal</label>
+                                    <div class="slider-container">
+                                        <input type="range" name="prefer_horizontal" min="0" max="1" step="0.1" value="0.9"
+                                               oninput="this.nextElementSibling.textContent = this.value"
+                                               class="flex-1">
+                                        <span class="slider-value">0.9</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Relative Scaling</label>
+                                    <div class="slider-container">
+                                        <input type="range" name="relative_scaling" min="0" max="1" step="0.1" value="0.5"
+                                               oninput="this.nextElementSibling.textContent = this.value"
+                                               class="flex-1">
+                                        <span class="slider-value">0.5</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Custom Font (optional)</label>
+                                    <input type="file" name="custom_font" accept=".ttf,.otf"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Effects -->
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4">
+                                <i class="fas fa-palette mr-2"></i>Visual Effects
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Background Color</label>
+                                    <input type="color" name="background_color" value="#ffffff"
+                                           class="w-full h-10 rounded-lg cursor-pointer">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Color Map</label>
+                                    <select name="colormap" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                        <option value="viridis">Viridis</option>
+                                        <option value="plasma">Plasma</option>
+                                        <option value="inferno">Inferno</option>
+                                        <option value="magma">Magma</option>
+                                        <option value="cividis">Cividis</option>
+                                        <option value="twilight">Twilight</option>
+                                        <option value="rainbow">Rainbow</option>
+                                        <option value="ocean">Ocean</option>
+                                        <option value="gist_earth">Earth</option>
+                                        <option value="terrain">Terrain</option>
+                                        <option value="gnuplot">Gnuplot</option>
+                                        <option value="brg">BRG</option>
+                                        <option value="hsv">HSV</option>
+                                        <option value="jet">Jet</option>
+                                        <option value="pastel1">Pastel</option>
+                                        <option value="spring">Spring</option>
+                                        <option value="summer">Summer</option>
+                                        <option value="autumn">Autumn</option>
+                                        <option value="winter">Winter</option>
+                                        <option value="cool">Cool</option>
+                                        <option value="hot">Hot</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Contour Width</label>
+                                    <div class="slider-container">
+                                        <input type="range" name="contour_width" min="0" max="10" value="0"
+                                               oninput="this.nextElementSibling.textContent = this.value"
+                                               class="flex-1">
+                                        <span class="slider-value">0</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Contour Color</label>
+                                    <input type="color" name="contour_color" value="#4682b4"
+                                           class="w-full h-10 rounded-lg cursor-pointer">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Margin</label>
+                                    <input type="number" name="margin" value="2" min="0" max="50"
+                                           class="w-24 px-3 py-2 border border-gray-300 rounded-lg">
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Custom Mask (optional)</label>
+                                    <input type="file" name="mask_file" accept="image/*"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="mt-8 text-center">
+                    <button type="submit" class="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-bold py-4 px-12 rounded-lg text-xl shadow-lg transform transition hover:scale-105">
+                        <i class="fas fa-rocket mr-3"></i>Generate Advanced Word Cloud
+                    </button>
+                </div>
+            </form>
+
+            <!-- Features Info -->
+            <div class="mt-8 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-6">
+                <h3 class="font-bold text-lg mb-3">
+                    <i class="fas fa-star mr-2"></i>Studio Features
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-700">
+                    <div>
+                        <i class="fas fa-chart-bar text-green-600 mr-2"></i>
+                        <strong>Analytics:</strong> Word frequency charts
+                    </div>
+                    <div>
+                        <i class="fas fa-sliders-h text-teal-600 mr-2"></i>
+                        <strong>Full Control:</strong> Every parameter adjustable
+                    </div>
+                    <div>
+                        <i class="fas fa-download text-indigo-600 mr-2"></i>
+                        <strong>High Resolution:</strong> Up to 3200x2400px
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
